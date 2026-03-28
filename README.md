@@ -31,16 +31,24 @@ src/main/java/com/newbranch/backend/
 └── infrastructure/      # External API Integration
 ```
 
-## 주요 기능
+## 프로젝트 현황
 
-- ✅ RESTful API 설계
-- ✅ Domain-Driven Design (DDD) 구조
-- ✅ Global Exception Handling
-- ✅ Swagger UI Documentation
-- ✅ CORS 설정 (Next.js 연동)
-- ✅ PostgreSQL 연동
-- ✅ Docker 컨테이너화
-- ✅ JPA Auditing (created_at, updated_at)
+현재 **프로젝트 초기 설정 단계**입니다. ERD 설계 및 도메인 개발을 시작하기 전, 협업을 위한 기본 인프라와 개발 환경을 구축한 상태입니다.
+
+### 구성 완료된 항목
+
+- ✅ Spring Boot 기반 프로젝트 구조 (DDD 패턴)
+- ✅ Docker Compose 개발 환경 (PostgreSQL)
+- ✅ Global 설정 (CORS, Swagger, Exception Handler)
+- ✅ 공통 API Response 구조
+- ✅ 개발 문서 (README, SETUP, API_GUIDE)
+
+### 다음 단계
+
+1. ERD 설계 및 데이터베이스 스키마 정의
+2. 도메인별 비즈니스 로직 구현
+3. API 엔드포인트 개발
+4. 테스트 코드 작성
 
 ## 시작하기
 
@@ -197,7 +205,3 @@ docker run -d \
   -e SPRING_DATASOURCE_PASSWORD=your-password \
   newbranch-backend
 ```
-
-## 라이선스
-
-MIT License
