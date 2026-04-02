@@ -1,6 +1,5 @@
 # NewBranch Backend
 
-Spring Boot 3.x 기반의 백엔드 API 서버입니다. Next.js 프론트엔드와 협업을 위한 RESTful API를 제공합니다.
 
 > 📘 **프론트엔드 개발자용 가이드**: [API_GUIDE.md](./API_GUIDE.md) 참고
 
@@ -56,14 +55,7 @@ src/main/java/com/newbranch/backend/
 
 신규 팀원이 프로젝트에 합류했을 때 따라야 할 가이드입니다.
 
-### 1. 레포지토리 클론
-
-```bash
-git clone https://github.com/New-Branch-dev/nb-backend.git
-cd nb-backend
-```
-
-### 2. 로컬 개발 환경 설정
+### 1. 로컬 개발 환경 설정
 
 아래 "시작하기" 섹션의 지침을 따라 로컬 환경을 설정하세요:
 - Docker & Docker Compose 설치
@@ -71,7 +63,7 @@ cd nb-backend
 - PostgreSQL 컨테이너 실행
 - 애플리케이션 실행 및 연결 확인
 
-### 3. GitHub 이슈 및 PR 워크플로우
+### 2. GitHub 이슈 및 PR 워크플로우
 
 #### 이슈 생성
 1. GitHub 레포지토리 → **Issues** 탭
