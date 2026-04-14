@@ -18,7 +18,14 @@ public enum ErrorCode {
 
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User not found"),
-    USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "U002", "User already exists");
+    USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "U002", "User already exists"),
+
+    // Authentication & Authorization
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "Authentication is required"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A002", "Invalid or expired token"),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "A003", "Refresh token not found"),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A004", "Refresh token expired"),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A005", "Invalid email or password");
 
     private final HttpStatus status;
     private final String code;
