@@ -72,6 +72,34 @@ public class User extends BaseEntity {
     }
 
     /**
+     * 닉네임을 업데이트합니다
+     */
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    /**
+     * 연령대를 업데이트합니다
+     */
+    public void updateAgeGroup(String ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    /**
+     * 학교명을 업데이트합니다
+     */
+    public void updateSchoolName(String schoolName) {
+        this.schoolName = schoolName;
+    }
+
+    /**
+     * 사용자를 비활성화합니다 (소프트 삭제)
+     */
+    public void deactivate() {
+        super.deactivate();
+    }
+
+    /**
      * 관리자 권한을 부여합니다
      */
     public void grantAdminRole() {
