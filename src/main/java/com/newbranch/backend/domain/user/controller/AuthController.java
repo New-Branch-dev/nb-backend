@@ -61,4 +61,14 @@ public class AuthController {
         authService.logout(userDetails.getUsername());
         return ApiResponse.success();
     }
+
+    /**
+     * 이메일 인증
+     */
+    @Operation(summary = "이메일 인증", description = "이메일 인증 토큰으로 이메일을 인증합니다")
+    @GetMapping("/verify-email")
+    public ApiResponse<Void> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
+        return ApiResponse.success();
+    }
 }

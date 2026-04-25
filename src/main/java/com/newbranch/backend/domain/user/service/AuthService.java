@@ -36,6 +36,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtProperties jwtProperties;
     private final RedisTemplate<String, String> redisTemplate;
+    private final EmailService emailService;
 
     private static final String REFRESH_TOKEN_PREFIX = "RT:";
 
@@ -52,11 +53,14 @@ public class AuthService {
                 .nickname(request.getNickname())
                 .ageGroup(request.getAgeGroup())
                 .schoolName(request.getSchoolName())
+                .emailVerified(false)
                 .role(Role.ROLE_USER)
                 .build();
 
         User savedUser = userRepository.save(user);
         log.info("User registered: {}", savedUser.getEmail());
+
+        emailService.sendVerificationEmail(savedUser.getEmail());
 
         return UserResponse.from(savedUser);
     }
@@ -96,6 +100,20 @@ public class AuthService {
     public void logout(String email) {
         deleteRefreshToken(email);
         log.info("User logged out: {}", email);
+    }
+
+    /**
+     * 이메일 인증을 처리합니다
+     */
+    @Transactional
+    public void verifyEmail(String token) {
+        emailService.verifyEmail(token);
+
+        String email = emailService.getEmailFromToken(token);
+        User user = getUserByEmail(email);
+        user.verifyEmail();
+
+        log.info("User email verified: {}", email);
     }
 
     /**

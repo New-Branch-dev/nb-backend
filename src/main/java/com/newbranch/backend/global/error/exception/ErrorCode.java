@@ -25,7 +25,14 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A002", "Invalid or expired token"),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "A003", "Refresh token not found"),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A004", "Refresh token expired"),
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A005", "Invalid email or password");
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A005", "Invalid email or password"),
+
+    // Email Verification
+    INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "E001", "Invalid verification token"),
+    EXPIRED_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "E002", "Verification token expired"),
+    ALREADY_VERIFIED_EMAIL(HttpStatus.BAD_REQUEST, "E003", "Email already verified"),
+    EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "E004", "Email not verified"),
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "E005", "Failed to send email");
 
     private final HttpStatus status;
     private final String code;

@@ -40,6 +40,9 @@ public class User extends BaseEntity {
     @Column(name = "google_oauth_id", length = 255)
     private String googleOauthId;
 
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified = false;
+
     @Column(name = "is_admin", nullable = false)
     private Boolean isAdmin = false;
 
@@ -52,13 +55,14 @@ public class User extends BaseEntity {
 
     @Builder
     public User(String email, String password, String nickname, String ageGroup,
-                String schoolName, String googleOauthId, Boolean isAdmin, Boolean isGuest, Role role) {
+                String schoolName, String googleOauthId, Boolean emailVerified, Boolean isAdmin, Boolean isGuest, Role role) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.ageGroup = ageGroup;
         this.schoolName = schoolName;
         this.googleOauthId = googleOauthId;
+        this.emailVerified = emailVerified != null ? emailVerified : false;
         this.isAdmin = isAdmin != null ? isAdmin : false;
         this.isGuest = isGuest != null ? isGuest : false;
         this.role = role != null ? role : Role.ROLE_USER;
@@ -77,5 +81,12 @@ public class User extends BaseEntity {
     public void grantAdminRole() {
         this.isAdmin = true;
         this.role = Role.ROLE_ADMIN;
+    }
+
+    /**
+     * 이메일 인증을 완료합니다
+     */
+    public void verifyEmail() {
+        this.emailVerified = true;
     }
 }
