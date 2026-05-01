@@ -51,7 +51,7 @@ target/
 !**/src/test/**/target/
 
 ### Environment ###
-.env
+src/main/resources/.env
 .env.local
 .env.*.local
 
