@@ -20,6 +20,12 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User not found"),
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "U002", "User already exists"),
 
+    // Note
+    NOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "N001", "Note not found"),
+    NOTE_MATERIAL_NOT_FOUND(HttpStatus.NOT_FOUND, "N002", "Note material not found"),
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "N003", "Invalid file type. Allowed: PDF, PPT, Word, Audio"),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "N004", "File upload failed"),
+
     // Authentication & Authorization
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "Authentication is required"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A002", "Invalid or expired token"),
