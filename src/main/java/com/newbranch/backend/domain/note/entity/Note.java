@@ -1,5 +1,6 @@
 package com.newbranch.backend.domain.note.entity;
 
+import com.newbranch.backend.domain.goal.entity.LearningGoal;
 import com.newbranch.backend.domain.user.entity.User;
 import com.newbranch.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -32,6 +33,10 @@ public class Note extends BaseEntity {
     @Column(name = "source_type", length = 50)
     private String sourceType;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lg_id")
+    private LearningGoal goal;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private NoteStatus status = NoteStatus.DRAFT;
@@ -40,6 +45,10 @@ public class Note extends BaseEntity {
     public Note(User user) {
         this.user = user;
         this.status = NoteStatus.DRAFT;
+    }
+
+    public void linkToGoal(LearningGoal goal) {
+        this.goal = goal;
     }
 
     public void publish(String title, String content, String sourceType) {

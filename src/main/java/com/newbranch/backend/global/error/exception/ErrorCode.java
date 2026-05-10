@@ -20,6 +20,12 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User not found"),
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "U002", "User already exists"),
 
+    // Goal
+    GOAL_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "Learning goal not found"),
+    STUDY_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "G002", "Study plan not found"),
+    RETRIEVAL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "G003", "Retrieval plan not found"),
+    MEMORIZATION_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "G004", "Memorization plan not found"),
+
     // Note
     NOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "N001", "Note not found"),
     NOTE_MATERIAL_NOT_FOUND(HttpStatus.NOT_FOUND, "N002", "Note material not found"),
