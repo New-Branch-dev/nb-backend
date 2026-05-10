@@ -23,12 +23,16 @@ public class TokenResponse {
     @Schema(description = "만료 시간 (초)", example = "900")
     private Long expiresIn;
 
-    public static TokenResponse of(String accessToken, String refreshToken, Long expiresIn) {
+    @Schema(description = "사용자 닉네임", example = "뉴브랜치")
+    private String nickname;
+
+    public static TokenResponse of(String accessToken, String refreshToken, Long expiresIn, String nickname) {
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(expiresIn / 1000) // 밀리초를 초로 변환
+                .nickname(nickname)
                 .build();
     }
 }
