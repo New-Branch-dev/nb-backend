@@ -1,16 +1,19 @@
-name: CD - Deploy to Docker Hub
+name: CI/CD Pipeline
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
   push:
     branches:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # Phase A: Build
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -36,7 +39,29 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test --no-daemon
 
-      # Phase B: Docker Image
+      - name: Upload build artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build/libs/*.jar
+          retention-days: 7
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: build/libs/
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -75,14 +100,9 @@ jobs:
       #     username: ${{ secrets.EC2_USERNAME }}
       #     key: ${{ secrets.EC2_SSH_KEY }}
       #     script: |
-      #       # Pull latest image
       #       docker pull ${{ secrets.DOCKER_USERNAME }}/newbranch-backend:latest
-      #
-      #       # Stop and remove old container
       #       docker stop newbranch-app || true
       #       docker rm newbranch-app || true
-      #
-      #       # Run new container
       #       docker run -d \
       #         --name newbranch-app \
       #         --restart unless-stopped \
@@ -94,6 +114,4 @@ jobs:
       #         -e SERVER_PORT=8080 \
       #         -e LOG_LEVEL=INFO \
       #         ${{ secrets.DOCKER_USERNAME }}/newbranch-backend:latest
-      #
-      #       # Clean up old images
       #       docker image prune -af

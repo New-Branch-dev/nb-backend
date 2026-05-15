@@ -136,10 +136,13 @@ public class AuthService {
     private TokenResponse generateTokens(Authentication authentication) {
         String accessToken = jwtTokenProvider.createAccessToken(authentication);
         String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+        String email = authentication.getName();
 
         storeRefreshToken(authentication.getName(), refreshToken);
 
-        return TokenResponse.of(accessToken, refreshToken, jwtProperties.getAccessTokenExpiration());
+        User user = getUserByEmail(email);
+
+        return TokenResponse.of(accessToken, refreshToken, jwtProperties.getAccessTokenExpiration(), user.getNickname());
     }
 
     /**
