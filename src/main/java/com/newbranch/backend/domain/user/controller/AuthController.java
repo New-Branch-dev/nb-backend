@@ -24,6 +24,7 @@ public class AuthController {
 
     /**
      * 회원가입
+     * [F-L-001] 회원/로그인 > 로그인 > 회원가입
      */
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다")
     @PostMapping("/signup")
@@ -33,7 +34,8 @@ public class AuthController {
     }
 
     /**
-     * 로그인
+     * 로그인 및 토큰 발급
+     * [F-L-002] 회원/로그인 > 로그인 > 로그인 및 토큰 발급
      */
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하여 JWT 토큰을 발급받습니다")
     @PostMapping("/login")
@@ -43,7 +45,8 @@ public class AuthController {
     }
 
     /**
-     * 토큰 재발급
+     * Access Token 갱신
+     * [F-L-003] 회원/로그인 > 회원가입 > Access Token 갱신
      */
     @Operation(summary = "토큰 재발급", description = "Refresh Token으로 새로운 Access Token을 발급받습니다")
     @PostMapping("/refresh")
@@ -54,6 +57,7 @@ public class AuthController {
 
     /**
      * 로그아웃
+     * [F-L-004] 회원/로그인 > 로그아웃 > 로그아웃
      */
     @Operation(summary = "로그아웃", description = "Refresh Token을 무효화합니다")
     @PostMapping("/logout")
