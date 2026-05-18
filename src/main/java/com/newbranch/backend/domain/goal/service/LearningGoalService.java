@@ -153,7 +153,7 @@ public class LearningGoalService {
     // F-GO-004: 학습 목표 검색
     public List<LearningGoalResponse> searchGoals(String email, String keyword) {
         User user = findUserByEmail(email);
-        return learningGoalRepository.findAllByUserAndIsActiveTrueAndTitleContainingIgnoreCase(user, keyword)
+        return learningGoalRepository.searchByKeyword(user, keyword)
                 .stream()
                 .map(LearningGoalResponse::from)
                 .toList();
