@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Retrieval Plan", description = "인출 계획 API")
 @RestController
-@RequestMapping("/api/v1/goals/{goalId}/retrieval")
+@RequestMapping("/api/v1/goals/{lgId}/retrieval")
 @RequiredArgsConstructor
 public class RetrievalPlanController {
 
     private final RetrievalPlanService retrievalPlanService;
 
     @Operation(summary = "인출 계획 수정")
-    @PutMapping("/{planId}")
+    @PutMapping("/{rpId}")
     public ApiResponse<RetrievalPlanResponse> updatePlan(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long goalId,
-            @PathVariable Long planId,
+            @PathVariable Long lgId,
+            @PathVariable Long rpId,
             @RequestBody RetrievalPlanRequest request) {
-        return ApiResponse.success(retrievalPlanService.updatePlan(userDetails.getUsername(), goalId, planId, request));
+        return ApiResponse.success(retrievalPlanService.updatePlan(userDetails.getUsername(), lgId, rpId, request));
     }
 }

@@ -31,10 +31,10 @@ public class StudyPlanService {
 
     // 기타학습 계획 수정
     @Transactional
-    public StudyPlanResponse updatePlan(String email, Long goalId, Long planId, StudyPlanRequest request) {
+    public StudyPlanResponse updatePlan(String email, Long lgId, Long spId, StudyPlanRequest request) {
         User user = findUserByEmail(email);
-        learningGoalService.findGoalByIdAndUser(goalId, user);
-        StudyPlan plan = studyPlanRepository.findByIdAndIsActiveTrue(planId)
+        learningGoalService.findGoalByIdAndUser(lgId, user);
+        StudyPlan plan = studyPlanRepository.findByIdAndIsActiveTrue(spId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STUDY_PLAN_NOT_FOUND));
         plan.update(request.getStartDate(), request.getEndDate(), request.getRepetitionCount(), request.getMethod());
         return StudyPlanResponse.from(plan);
@@ -42,9 +42,9 @@ public class StudyPlanService {
 
     // 일별 공부시간 설정 (벌크 저장)
     @Transactional
-    public List<DailyStudyTimeResponse> saveStudyTimes(String email, Long goalId, DailyStudyTimeRequest request) {
+    public List<DailyStudyTimeResponse> saveStudyTimes(String email, Long lgId, DailyStudyTimeRequest request) {
         User user = findUserByEmail(email);
-        LearningGoal goal = learningGoalService.findGoalByIdAndUser(goalId, user);
+        LearningGoal goal = learningGoalService.findGoalByIdAndUser(lgId, user);
         dailyStudyTimeRepository.deleteAllByLearningGoal(goal);
         List<DailyStudyTime> times = request.getStudyTimes().stream()
                 .map(entry -> DailyStudyTime.builder()

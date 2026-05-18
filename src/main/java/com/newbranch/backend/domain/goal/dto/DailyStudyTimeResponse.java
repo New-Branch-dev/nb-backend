@@ -10,13 +10,13 @@ import java.time.LocalDate;
 @Builder
 public class DailyStudyTimeResponse {
 
-    private Long id;
+    private Long dstId;
     private LocalDate studyDate;
     private Integer availableMinutes;
 
     public static DailyStudyTimeResponse from(DailyStudyTime dst) {
         return DailyStudyTimeResponse.builder()
-                .id(dst.getId())
+                .dstId(dst.getId())
                 .studyDate(dst.getStudyDate())
                 .availableMinutes(dst.getAvailableMinutes())
                 .build();

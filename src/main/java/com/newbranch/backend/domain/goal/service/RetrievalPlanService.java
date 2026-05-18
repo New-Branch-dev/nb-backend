@@ -22,10 +22,10 @@ public class RetrievalPlanService {
     private final UserRepository userRepository;
 
     @Transactional
-    public RetrievalPlanResponse updatePlan(String email, Long goalId, Long planId, RetrievalPlanRequest request) {
+    public RetrievalPlanResponse updatePlan(String email, Long lgId, Long rpId, RetrievalPlanRequest request) {
         User user = findUserByEmail(email);
-        learningGoalService.findGoalByIdAndUser(goalId, user);
-        RetrievalPlan plan = retrievalPlanRepository.findByIdAndIsActiveTrue(planId)
+        learningGoalService.findGoalByIdAndUser(lgId, user);
+        RetrievalPlan plan = retrievalPlanRepository.findByIdAndIsActiveTrue(rpId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RETRIEVAL_PLAN_NOT_FOUND));
         plan.update(request.getStartDate(), request.getEndDate(), request.getRepetitionCount(), request.getMethod());
         return RetrievalPlanResponse.from(plan);

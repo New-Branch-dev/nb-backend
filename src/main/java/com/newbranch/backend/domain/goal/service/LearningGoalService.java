@@ -130,9 +130,9 @@ public class LearningGoalService {
     }
 
     // F-GO-003: 학습 목표 상세 조회
-    public LearningGoalResponse getGoal(String email, Long goalId) {
+    public LearningGoalResponse getGoal(String email, Long lgId) {
         User user = findUserByEmail(email);
-        LearningGoal goal = findGoalByIdAndUser(goalId, user);
+        LearningGoal goal = findGoalByIdAndUser(lgId, user);
 
         List<MemorizationPlanResponse> mpList = memorizationPlanRepository
                 .findAllByLearningGoalAndIsActiveTrue(goal).stream()
@@ -161,16 +161,16 @@ public class LearningGoalService {
 
     // F-GO-005: 학습 목표 삭제
     @Transactional
-    public void deleteGoal(String email, Long goalId) {
+    public void deleteGoal(String email, Long lgId) {
         User user = findUserByEmail(email);
-        findGoalByIdAndUser(goalId, user).deactivate();
+        findGoalByIdAndUser(lgId, user).deactivate();
     }
 
     // F-GO-006: 학습 목표 수정
     @Transactional
-    public LearningGoalResponse updateGoal(String email, Long goalId, LearningGoalRequest request) {
+    public LearningGoalResponse updateGoal(String email, Long lgId, LearningGoalRequest request) {
         User user = findUserByEmail(email);
-        LearningGoal goal = findGoalByIdAndUser(goalId, user);
+        LearningGoal goal = findGoalByIdAndUser(lgId, user);
         goal.update(request.getTitle(), request.getPurpose(), request.getTargetScore(), request.getMaxScore(),
                 request.getStartDate(), request.getEndDate(), request.getStudyMethod());
         return LearningGoalResponse.from(goal);

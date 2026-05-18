@@ -40,11 +40,11 @@ public class LearningGoalController {
 
     // F-GO-003: 학습 목표 상세 조회
     @Operation(summary = "학습 목표 상세 조회")
-    @GetMapping("/{goalId}")
+    @GetMapping("/{lgId}")
     public ApiResponse<LearningGoalResponse> getGoal(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long goalId) {
-        return ApiResponse.success(learningGoalService.getGoal(userDetails.getUsername(), goalId));
+            @PathVariable Long lgId) {
+        return ApiResponse.success(learningGoalService.getGoal(userDetails.getUsername(), lgId));
     }
 
     // F-GO-004: 학습 목표 검색
@@ -58,21 +58,21 @@ public class LearningGoalController {
 
     // F-GO-005: 학습 목표 삭제
     @Operation(summary = "학습 목표 삭제")
-    @DeleteMapping("/{goalId}")
+    @DeleteMapping("/{lgId}")
     public ApiResponse<Void> deleteGoal(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long goalId) {
-        learningGoalService.deleteGoal(userDetails.getUsername(), goalId);
+            @PathVariable Long lgId) {
+        learningGoalService.deleteGoal(userDetails.getUsername(), lgId);
         return ApiResponse.success();
     }
 
     // F-GO-006: 학습 목표 수정
     @Operation(summary = "학습 목표 수정")
-    @PutMapping("/{goalId}")
+    @PutMapping("/{lgId}")
     public ApiResponse<LearningGoalResponse> updateGoal(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long goalId,
+            @PathVariable Long lgId,
             @Valid @RequestBody LearningGoalRequest request) {
-        return ApiResponse.success(learningGoalService.updateGoal(userDetails.getUsername(), goalId, request));
+        return ApiResponse.success(learningGoalService.updateGoal(userDetails.getUsername(), lgId, request));
     }
 }

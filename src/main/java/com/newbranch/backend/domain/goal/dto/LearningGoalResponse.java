@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class LearningGoalResponse {
 
-    private Long id;
+    private Long lgId;
     private String title;
     private String purpose;
     private Integer targetScore;
@@ -33,7 +33,7 @@ public class LearningGoalResponse {
 
     public static LearningGoalResponse from(LearningGoal goal) {
         return LearningGoalResponse.builder()
-                .id(goal.getId())
+                .lgId(goal.getId())
                 .title(goal.getTitle())
                 .purpose(goal.getPurpose())
                 .targetScore(goal.getTargetScore())
@@ -56,7 +56,7 @@ public class LearningGoalResponse {
             List<StudyPlanResponse> studyPlans,
             List<DailyStudyTimeResponse> dailyStudyTimes) {
         return LearningGoalResponse.builder()
-                .id(goal.getId())
+                .lgId(goal.getId())
                 .title(goal.getTitle())
                 .purpose(goal.getPurpose())
                 .targetScore(goal.getTargetScore())

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 public class StudyPlanResponse {
 
-    private Long id;
+    private Long spId;
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer repetitionCount;
@@ -19,7 +19,7 @@ public class StudyPlanResponse {
 
     public static StudyPlanResponse from(StudyPlan plan) {
         return StudyPlanResponse.builder()
-                .id(plan.getId())
+                .spId(plan.getId())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .repetitionCount(plan.getRepetitionCount())

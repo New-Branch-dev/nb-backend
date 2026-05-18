@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 public class RetrievalPlanResponse {
 
-    private Long id;
+    private Long rpId;
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer repetitionCount;
@@ -19,7 +19,7 @@ public class RetrievalPlanResponse {
 
     public static RetrievalPlanResponse from(RetrievalPlan plan) {
         return RetrievalPlanResponse.builder()
-                .id(plan.getId())
+                .rpId(plan.getId())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .repetitionCount(plan.getRepetitionCount())

@@ -22,10 +22,10 @@ public class MemorizationPlanService {
     private final UserRepository userRepository;
 
     @Transactional
-    public MemorizationPlanResponse updatePlan(String email, Long goalId, Long planId, MemorizationPlanRequest request) {
+    public MemorizationPlanResponse updatePlan(String email, Long lgId, Long mpId, MemorizationPlanRequest request) {
         User user = findUserByEmail(email);
-        learningGoalService.findGoalByIdAndUser(goalId, user);
-        MemorizationPlan plan = memorizationPlanRepository.findByIdAndIsActiveTrue(planId)
+        learningGoalService.findGoalByIdAndUser(lgId, user);
+        MemorizationPlan plan = memorizationPlanRepository.findByIdAndIsActiveTrue(mpId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMORIZATION_PLAN_NOT_FOUND));
         plan.update(request.getStartDate(), request.getEndDate(), request.getRepetitionCount(), request.getMethod());
         return MemorizationPlanResponse.from(plan);

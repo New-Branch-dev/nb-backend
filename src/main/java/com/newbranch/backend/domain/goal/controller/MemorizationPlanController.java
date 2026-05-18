@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Memorization Plan", description = "암기 계획 API")
 @RestController
-@RequestMapping("/api/v1/goals/{goalId}/memorization")
+@RequestMapping("/api/v1/goals/{lgId}/memorization")
 @RequiredArgsConstructor
 public class MemorizationPlanController {
 
     private final MemorizationPlanService memorizationPlanService;
 
     @Operation(summary = "암기 계획 수정")
-    @PutMapping("/{planId}")
+    @PutMapping("/{mpId}")
     public ApiResponse<MemorizationPlanResponse> updatePlan(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long goalId,
-            @PathVariable Long planId,
+            @PathVariable Long lgId,
+            @PathVariable Long mpId,
             @RequestBody MemorizationPlanRequest request) {
-        return ApiResponse.success(memorizationPlanService.updatePlan(userDetails.getUsername(), goalId, planId, request));
+        return ApiResponse.success(memorizationPlanService.updatePlan(userDetails.getUsername(), lgId, mpId, request));
     }
 }

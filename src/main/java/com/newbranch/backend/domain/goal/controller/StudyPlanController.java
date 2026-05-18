@@ -18,28 +18,28 @@ import java.util.List;
 
 @Tag(name = "Study Plan", description = "기타학습 계획 API")
 @RestController
-@RequestMapping("/api/v1/goals/{goalId}/study-plans")
+@RequestMapping("/api/v1/goals/{lgId}/study-plans")
 @RequiredArgsConstructor
 public class StudyPlanController {
 
     private final StudyPlanService studyPlanService;
 
     @Operation(summary = "기타학습 계획 수정")
-    @PutMapping("/{planId}")
+    @PutMapping("/{spId}")
     public ApiResponse<StudyPlanResponse> updatePlan(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long goalId,
-            @PathVariable Long planId,
+            @PathVariable Long lgId,
+            @PathVariable Long spId,
             @RequestBody StudyPlanRequest request) {
-        return ApiResponse.success(studyPlanService.updatePlan(userDetails.getUsername(), goalId, planId, request));
+        return ApiResponse.success(studyPlanService.updatePlan(userDetails.getUsername(), lgId, spId, request));
     }
 
     @Operation(summary = "일별 공부시간 설정", description = "날짜별 가능한 공부 시간을 일괄 저장합니다")
     @PostMapping("/study-times")
     public ApiResponse<List<DailyStudyTimeResponse>> saveStudyTimes(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long goalId,
+            @PathVariable Long lgId,
             @Valid @RequestBody DailyStudyTimeRequest request) {
-        return ApiResponse.success(studyPlanService.saveStudyTimes(userDetails.getUsername(), goalId, request));
+        return ApiResponse.success(studyPlanService.saveStudyTimes(userDetails.getUsername(), lgId, request));
     }
 }
