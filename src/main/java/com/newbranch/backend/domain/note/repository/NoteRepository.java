@@ -15,4 +15,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findAllByUserAndIsActiveTrueAndStatus(User user, NoteStatus status);
 
     Optional<Note> findByIdAndIsActiveTrue(Long id);
+
+    List<Note> findAllByIdInAndIsActiveTrue(List<Long> ids);
 }
