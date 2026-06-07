@@ -22,6 +22,9 @@ public class User extends BaseEntity {
     @Column(name = "users_id")
     private Long id;
 
+    @Column(name = "login_id", nullable = false, unique = true, length = 50)
+    private String loginId;
+
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
@@ -54,9 +57,10 @@ public class User extends BaseEntity {
     private Role role = Role.ROLE_USER;
 
     @Builder
-    public User(String email, String password, String nickname, String ageGroup,
+    public User(String email, String loginId, String password, String nickname, String ageGroup,
                 String schoolName, String googleOauthId, Boolean emailVerified, Boolean isAdmin, Boolean isGuest, Role role) {
         this.email = email;
+        this.loginId = loginId;
         this.password = password;
         this.nickname = nickname;
         this.ageGroup = ageGroup;

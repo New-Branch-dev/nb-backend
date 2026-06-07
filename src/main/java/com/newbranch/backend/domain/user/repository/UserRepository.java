@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * 이메일로 활성화된 사용자를 조회합니다
      */
-    Optional<User> findByEmailAndIsActiveTrue(String email);
+    Optional<User> findByLoginIdAndIsActiveTrue(String loginId);
 
     /**
      * 이메일 중복 여부를 확인합니다
@@ -31,4 +31,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Google OAuth ID로 사용자를 조회합니다
      */
     Optional<User> findByGoogleOauthId(String googleOauthId);
+
+    /**
+     * 아이디 중복 여부를 확인합니다
+     */
+    boolean existsByLoginId(String loginId);
+
+    /**
+     * 사용자 로그인 ID를 조회합니다
+     */
+    Optional<User> findByLoginId(String loginId);
 }

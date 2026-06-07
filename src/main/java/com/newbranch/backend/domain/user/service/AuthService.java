@@ -48,6 +48,7 @@ public class AuthService {
         validateDuplicateEmail(request.getEmail());
 
         User user = User.builder()
+                .loginId(request.getLoginId())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
@@ -122,10 +123,10 @@ public class AuthService {
     private Authentication authenticate(LoginRequest request) {
         try {
             return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getLoginId(), request.getPassword())
             );
         } catch (Exception e) {
-            log.error("Authentication failed for user: {}", request.getEmail());
+            log.error("Authentication failed for user: {}", request.getLoginId());
             throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
         }
     }
@@ -136,22 +137,38 @@ public class AuthService {
     private TokenResponse generateTokens(Authentication authentication) {
         String accessToken = jwtTokenProvider.createAccessToken(authentication);
         String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
-        String email = authentication.getName();
+        String loginId = authentication.getName();
 
-        storeRefreshToken(authentication.getName(), refreshToken);
+        storeRefreshToken(loginId, refreshToken);
 
-        User user = getUserByEmail(email);
+        User user = getUserByLoginId(loginId);
 
         return TokenResponse.of(accessToken, refreshToken, jwtProperties.getAccessTokenExpiration(), user.getNickname());
     }
 
     /**
+     * 사용자 로그인 ID를 조회합니다
+     */
+    private User getUserByLoginId(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    /**
      * 이메일 중복을 검증합니다
      */
-    private void validateDuplicateEmail(String email) {
+    public void validateDuplicateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new BusinessException(ErrorCode.USER_ALREADY_EXISTS);
         }
+    }
+
+    /**
+     * 아이디 중복을 검증합니다
+     */
+    @Transactional(readOnly = true)
+    public boolean validateDuplicateUserId(String loginId) {
+        return userRepository.existsByLoginId(loginId);
     }
 
     /**
@@ -167,7 +184,7 @@ public class AuthService {
      * 이메일로 사용자를 조회합니다
      */
     private User getUserByEmail(String email) {
-        return userRepository.findByEmailAndIsActiveTrue(email)
+        return userRepository.findByLoginIdAndIsActiveTrue(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 

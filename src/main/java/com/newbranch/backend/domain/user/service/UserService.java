@@ -69,7 +69,7 @@ public class UserService {
      * 이메일로 활성화된 사용자를 조회합니다.
      */
     private User findActiveUserByEmail(String email) {
-        return userRepository.findByEmailAndIsActiveTrue(email)
+        return userRepository.findByLoginIdAndIsActiveTrue(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 
