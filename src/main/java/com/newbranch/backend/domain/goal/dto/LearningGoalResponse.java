@@ -23,6 +23,7 @@ public class LearningGoalResponse {
     private String difficultyAnalysis;
     private String trendAnalysis;
     private String recommendedMethod;
+    private Boolean hasAiStudyPlan;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -44,6 +45,7 @@ public class LearningGoalResponse {
                 .difficultyAnalysis(goal.getDifficultyAnalysis())
                 .trendAnalysis(goal.getTrendAnalysis())
                 .recommendedMethod(goal.getRecommendedMethod())
+                .hasAiStudyPlan(goal.getAiStudyPlan() != null)
                 .createdAt(goal.getCreatedAt())
                 .updatedAt(goal.getUpdatedAt())
                 .build();
@@ -67,6 +69,7 @@ public class LearningGoalResponse {
                 .difficultyAnalysis(goal.getDifficultyAnalysis())
                 .trendAnalysis(goal.getTrendAnalysis())
                 .recommendedMethod(goal.getRecommendedMethod())
+                .hasAiStudyPlan(goal.getAiStudyPlan() != null)
                 .createdAt(goal.getCreatedAt())
                 .updatedAt(goal.getUpdatedAt())
                 .memorizationPlans(memorizationPlans)

@@ -39,6 +39,10 @@ public enum ErrorCode {
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A004", "Refresh token expired"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A005", "Invalid email or password"),
 
+    // AI
+    AI_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI001", "AI service error"),
+    AI_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "AI002", "AI study plan not found"),
+
     // Email Verification
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "E001", "Invalid verification token"),
     EXPIRED_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "E002", "Verification token expired"),
