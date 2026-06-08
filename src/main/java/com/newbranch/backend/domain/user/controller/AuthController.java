@@ -2,7 +2,6 @@ package com.newbranch.backend.domain.user.controller;
 
 import com.newbranch.backend.domain.user.dto.*;
 import com.newbranch.backend.domain.user.service.AuthService;
-import com.newbranch.backend.domain.user.service.EmailService;
 import com.newbranch.backend.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final EmailService emailService;
 
     /**
      * 회원가입
@@ -75,26 +73,6 @@ public class AuthController {
     @GetMapping("/verify-email")
     public ApiResponse<Void> verifyEmail(@RequestParam String token) {
         authService.verifyEmail(token);
-        return ApiResponse.success();
-    }
-
-    /**
-     * 이메일 인증번호 발송 요청
-     */
-    @Operation(summary = "이메일 인증번호 발송", description = "입력한 이메일로 6자리 인증번호를 발송합니다")
-    @PostMapping("/email/request")
-    public ApiResponse<Void> requestEmailVerification(@RequestParam String email) {
-        emailService.sendVerificationEmail(email); // authService 단에 연결
-        return ApiResponse.success();
-    }
-
-    /**
-     * 이메일 인증번호 검증 확인
-     */
-    @Operation(summary = "이메일 인증번호 검증", description = "사용자가 입력한 6자리 인증번호를 검증합니다")
-    @PostMapping("/email/verify")
-    public ApiResponse<Void> verifyEmailCode(@RequestParam String email, @RequestParam String code) {
-        emailService.verifyEmailCode(email, code); // authService 단에 연결
         return ApiResponse.success();
     }
 }
