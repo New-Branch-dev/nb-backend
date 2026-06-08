@@ -1,15 +1,17 @@
 package com.newbranch.backend.domain.mylearning.service;
 
 import com.newbranch.backend.domain.mylearning.dto.MyLearningRequest;
+import com.newbranch.backend.domain.mylearning.dto.MyLearningResponse;
 import com.newbranch.backend.domain.mylearning.entity.UserLearningStyle;
 import com.newbranch.backend.domain.mylearning.entity.UserSetting;
 import com.newbranch.backend.domain.mylearning.repository.UserLearningStyleRepository;
 import com.newbranch.backend.domain.mylearning.repository.UserSettingRepository;
+import com.newbranch.backend.domain.user.service.UserQueryService;
+import com.newbranch.backend.global.error.exception.BusinessException;
+import com.newbranch.backend.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,39 +20,25 @@ public class MyLearningService {
 
     private final UserSettingRepository userSettingRepository;
     private final UserLearningStyleRepository userLearningStyleRepository;
+    private final UserQueryService userQueryService;
 
-    /**
-     * 회원 설정, 학습유형 조회
-     */
-    public MyLearningRequest getMyLearningData(Long usersId) {
+    public MyLearningResponse getMyLearningData(String email) {
+        Long usersId = userQueryService.findByEmail(email).getId();
+
         UserSetting setting = userSettingRepository.findByUsersIdAndIsActiveTrue(usersId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자의 마이러닝 설정 정보가 존재하지 않습니다. ID: " + usersId));
-
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
         UserLearningStyle style = userLearningStyleRepository.findByUsersIdAndIsActiveTrue(usersId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자의 마이러닝 학습유형 정보가 존재하지 않습니다. ID: " + usersId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-        return MyLearningRequest.builder()
-                .usersId(setting.getUsersId())
-                .preferredStudyTime(setting.getPreferredStudyTime())
-                .offDays(setting.getOffDays())
-                .preferredMaterialFormat(setting.getPreferredMaterialFormat())
-                .preferredClassStyle(setting.getPreferredClassStyle())
-                .preferredStudyMethod(setting.getPreferredStudyMethod())
-                .preferredTeacherStyle(setting.getPreferredTeacherStyle())
-                .preferredFriendStyle(setting.getPreferredFriendStyle())
-                .extraNotes(setting.getExtraNotes())
-                .learningStyle(style.getLearningStyle())
-                .recommendedMethod(style.getRecommendedMethod())
-                .build();
+        return MyLearningResponse.of(setting, style);
     }
 
-    /**
-     * 회원 설정, 학습유형 등록
-     */
     @Transactional
-    public MyLearningRequest createMyLearningData(MyLearningRequest dto) {
+    public MyLearningResponse createMyLearningData(String email, MyLearningRequest dto) {
+        Long usersId = userQueryService.findByEmail(email).getId();
+
         UserSetting setting = UserSetting.builder()
-                .usersId(dto.getUsersId())
+                .usersId(usersId)
                 .preferredStudyTime(dto.getPreferredStudyTime())
                 .offDays(dto.getOffDays())
                 .preferredMaterialFormat(dto.getPreferredMaterialFormat())
@@ -63,26 +51,23 @@ public class MyLearningService {
         userSettingRepository.save(setting);
 
         UserLearningStyle style = UserLearningStyle.builder()
-                .usersId(dto.getUsersId())
+                .usersId(usersId)
                 .learningStyle(dto.getLearningStyle())
                 .recommendedMethod(dto.getRecommendedMethod())
                 .build();
         userLearningStyleRepository.save(style);
 
-        return dto;
+        return MyLearningResponse.of(setting, style);
     }
 
-    /**
-     * 회원 설정, 학습유형 수정
-     */
     @Transactional
-    public MyLearningRequest updateMyLearningData(Long usersId, MyLearningRequest dto) {
+    public MyLearningResponse updateMyLearningData(String email, MyLearningRequest dto) {
+        Long usersId = userQueryService.findByEmail(email).getId();
 
         UserSetting setting = userSettingRepository.findByUsersIdAndIsActiveTrue(usersId)
-                .orElseThrow(() -> new IllegalArgumentException("수정할 설정 정보가 존재하지 않습니다. ID: " + usersId));
-
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
         UserLearningStyle style = userLearningStyleRepository.findByUsersIdAndIsActiveTrue(usersId)
-                .orElseThrow(() -> new IllegalArgumentException("수정할 학습유형 정보가 존재하지 않습니다. ID: " + usersId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         setting.setPreferredStudyTime(dto.getPreferredStudyTime());
         setting.setOffDays(dto.getOffDays());
@@ -92,23 +77,20 @@ public class MyLearningService {
         setting.setPreferredTeacherStyle(dto.getPreferredTeacherStyle());
         setting.setPreferredFriendStyle(dto.getPreferredFriendStyle());
         setting.setExtraNotes(dto.getExtraNotes());
-
         style.setLearningStyle(dto.getLearningStyle());
         style.setRecommendedMethod(dto.getRecommendedMethod());
 
-        return dto;
+        return MyLearningResponse.of(setting, style);
     }
 
-    /**
-     * 회원 설정, 학습유형 삭제
-     */
     @Transactional
-    public void deleteMyLearningData(Long usersId) {
-        UserSetting setting = userSettingRepository.findByUsersIdAndIsActiveTrue(usersId)
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 설정 정보가 존재하지 않습니다. ID: " + usersId));
+    public void deleteMyLearningData(String email) {
+        Long usersId = userQueryService.findByEmail(email).getId();
 
+        UserSetting setting = userSettingRepository.findByUsersIdAndIsActiveTrue(usersId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
         UserLearningStyle style = userLearningStyleRepository.findByUsersIdAndIsActiveTrue(usersId)
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 학습유형 정보가 존재하지 않습니다. ID: " + usersId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
         setting.setIsActive(false);
         style.setIsActive(false);

@@ -1,49 +1,50 @@
 package com.newbranch.backend.domain.mylearning.controller;
 
 import com.newbranch.backend.domain.mylearning.dto.MyLearningRequest;
+import com.newbranch.backend.domain.mylearning.dto.MyLearningResponse;
 import com.newbranch.backend.domain.mylearning.service.MyLearningService;
+import com.newbranch.backend.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "My Learning", description = "나만의 학습 API")
 @RestController
-@RequestMapping("/api/mylearning")
+@RequestMapping("/api/v1/mylearning")
 @RequiredArgsConstructor
 public class MyLearningController {
 
     private final MyLearningService myLearningService;
 
-    // 회원 설정, 학습유형 조회
     @Operation(summary = "회원 설정, 학습유형 조회")
-    @GetMapping("/{usersId}")
-    public ResponseEntity<MyLearningRequest> getMyLearningData(@PathVariable Long usersId) {
-        return ResponseEntity.ok(myLearningService.getMyLearningData(usersId));
+    @GetMapping
+    public ApiResponse<MyLearningResponse> getMyLearningData(@AuthenticationPrincipal UserDetails userDetails) {
+        return ApiResponse.success(myLearningService.getMyLearningData(userDetails.getUsername()));
     }
 
-    // 회원 설정, 학습유형  등록
     @Operation(summary = "회원 설정, 학습유형 생성")
     @PostMapping
-    public ResponseEntity<MyLearningRequest> createMyLearningData(@RequestBody MyLearningRequest dto) {
-        return ResponseEntity.ok(myLearningService.createMyLearningData(dto));
-    }
-
-    // 회원 설정, 학습유형 수정
-    @Operation(summary = "회원 설정, 학습유형 수정")
-    @PutMapping("/{usersId}")
-    public ResponseEntity<MyLearningRequest> updateMyLearningData(
-            @PathVariable Long usersId,
+    public ApiResponse<MyLearningResponse> createMyLearningData(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody MyLearningRequest dto) {
-        return ResponseEntity.ok(myLearningService.updateMyLearningData(usersId, dto));
+        return ApiResponse.success(myLearningService.createMyLearningData(userDetails.getUsername(), dto));
     }
 
-    // 회원 설정, 학습유형 삭제
+    @Operation(summary = "회원 설정, 학습유형 수정")
+    @PutMapping
+    public ApiResponse<MyLearningResponse> updateMyLearningData(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody MyLearningRequest dto) {
+        return ApiResponse.success(myLearningService.updateMyLearningData(userDetails.getUsername(), dto));
+    }
+
     @Operation(summary = "회원 설정, 학습유형 삭제")
-    @DeleteMapping("/{usersId}")
-    public ResponseEntity<Void> deleteMyLearningData(@PathVariable Long usersId) {
-        myLearningService.deleteMyLearningData(usersId);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping
+    public ApiResponse<Void> deleteMyLearningData(@AuthenticationPrincipal UserDetails userDetails) {
+        myLearningService.deleteMyLearningData(userDetails.getUsername());
+        return ApiResponse.success(null);
     }
 }

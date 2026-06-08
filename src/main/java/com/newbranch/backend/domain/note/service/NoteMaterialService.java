@@ -12,6 +12,8 @@ import com.newbranch.backend.domain.user.entity.User;
 import com.newbranch.backend.domain.user.repository.UserRepository;
 import com.newbranch.backend.global.error.exception.BusinessException;
 import com.newbranch.backend.global.error.exception.ErrorCode;
+import com.newbranch.backend.infra.extraction.TextExtractionService;
+import com.newbranch.backend.infra.openai.OpenAiClient;
 import com.newbranch.backend.infra.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class NoteMaterialService {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final S3Uploader s3Uploader;
+    private final TextExtractionService textExtractionService;
+    private final OpenAiClient openAiClient;
 
     // 파일 업로드 (PDF, PPT, Word) - 여러 개 가능
     @Transactional
@@ -38,6 +42,7 @@ public class NoteMaterialService {
         Note note = findNoteByIdAndUser(noteId, user);
 
         return files.stream().map(file -> {
+            String extractedText = textExtractionService.extract(file);
             String fileUrl = s3Uploader.upload(file, "notes/files", S3Uploader.FILE_CONTENT_TYPES);
             NoteMaterial material = NoteMaterial.builder()
                     .user(user)
@@ -45,6 +50,7 @@ public class NoteMaterialService {
                     .materialType(MaterialType.FILE)
                     .fileName(file.getOriginalFilename())
                     .fileUrl(fileUrl)
+                    .extractedText(extractedText)
                     .build();
             return NoteMaterialResponse.from(noteMaterialRepository.save(material));
         }).collect(Collectors.toList());
@@ -56,6 +62,7 @@ public class NoteMaterialService {
         User user = findUserByEmail(email);
         Note note = findNoteByIdAndUser(noteId, user);
 
+        String extractedText = openAiClient.transcribeAudio(file);
         String fileUrl = s3Uploader.upload(file, "notes/lectures", S3Uploader.LECTURE_CONTENT_TYPES);
         NoteMaterial material = NoteMaterial.builder()
                 .user(user)
@@ -63,6 +70,7 @@ public class NoteMaterialService {
                 .materialType(MaterialType.LECTURE)
                 .fileName(file.getOriginalFilename())
                 .fileUrl(fileUrl)
+                .extractedText(extractedText)
                 .build();
         return NoteMaterialResponse.from(noteMaterialRepository.save(material));
     }

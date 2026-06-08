@@ -7,20 +7,10 @@ import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
-/**
- * 모든 엔티티의 공통 필드를 정의하는 Base Entity
- * - created_at: 생성 시간 (자동 설정)
- * - updated_at: 수정 시간 (자동 갱신)
- * - is_active: 활성 상태 (soft delete 지원)
- */
 @Getter
 @MappedSuperclass
-@EnableJpaAuditing
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 

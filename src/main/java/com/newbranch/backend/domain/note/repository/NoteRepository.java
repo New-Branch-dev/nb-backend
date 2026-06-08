@@ -17,4 +17,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     Optional<Note> findByIdAndIsActiveTrue(Long id);
 
     List<Note> findAllByIdInAndIsActiveTrue(List<Long> ids);
+
+    List<Note> findAllByGoalAndIsActiveTrue(com.newbranch.backend.domain.goal.entity.LearningGoal goal);
 }
