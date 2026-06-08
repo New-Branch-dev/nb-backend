@@ -1,5 +1,6 @@
 package com.newbranch.backend.domain.goal.service;
 
+import com.newbranch.backend.domain.goal.dto.DailyStudyTimeRequest;
 import com.newbranch.backend.domain.goal.dto.DailyStudyTimeResponse;
 import com.newbranch.backend.domain.goal.dto.LearningGoalRequest;
 import com.newbranch.backend.domain.goal.dto.LearningGoalResponse;
@@ -174,6 +175,27 @@ public class LearningGoalService {
         goal.update(request.getTitle(), request.getPurpose(), request.getTargetScore(), request.getMaxScore(),
                 request.getStartDate(), request.getEndDate(), request.getStudyMethod());
         return LearningGoalResponse.from(goal);
+    }
+
+    // 일별 공부 시간 수정
+    @Transactional
+    public List<DailyStudyTimeResponse> updateDailyStudyTimes(String email, Long lgId, DailyStudyTimeRequest request) {
+        User user = findUserByEmail(email);
+        LearningGoal goal = findGoalByIdAndUser(lgId, user);
+
+        dailyStudyTimeRepository.deleteAllByLearningGoal(goal);
+
+        List<DailyStudyTime> times = request.getStudyTimes().stream()
+                .map(entry -> DailyStudyTime.builder()
+                        .user(user)
+                        .learningGoal(goal)
+                        .studyDate(entry.getStudyDate())
+                        .availableMinutes(entry.getAvailableMinutes())
+                        .build())
+                .toList();
+        return dailyStudyTimeRepository.saveAll(times).stream()
+                .map(DailyStudyTimeResponse::from)
+                .toList();
     }
 
     LearningGoal findGoalByIdAndUser(Long goalId, User user) {

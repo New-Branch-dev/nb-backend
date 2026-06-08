@@ -45,9 +45,14 @@ public class NoteMaterial extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    // FILE, LECTURE 타입 - 업로드 시 추출된 텍스트 (AI 분석용)
+    @Column(name = "extracted_text", columnDefinition = "TEXT")
+    private String extractedText;
+
     @Builder
     public NoteMaterial(User user, Note note, MaterialType materialType,
-                        String fileName, String fileUrl, String title, String content) {
+                        String fileName, String fileUrl, String title, String content,
+                        String extractedText) {
         this.user = user;
         this.note = note;
         this.materialType = materialType;
@@ -55,5 +60,6 @@ public class NoteMaterial extends BaseEntity {
         this.fileUrl = fileUrl;
         this.title = title;
         this.content = content;
+        this.extractedText = extractedText;
     }
 }

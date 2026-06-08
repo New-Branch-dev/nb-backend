@@ -53,14 +53,34 @@ public class LearningGoal extends BaseEntity {
     @Column(name = "recommended_method", columnDefinition = "TEXT")
     private String recommendedMethod;
 
+    @Column(name = "ai_study_plan", columnDefinition = "TEXT")
+    private String aiStudyPlan;
+
+    @Column(name = "formative_assessment", columnDefinition = "TEXT")
+    private String formativeAssessment;
+
+    public void updateAiStudyPlan(String aiStudyPlan) {
+        this.aiStudyPlan = aiStudyPlan;
+    }
+
+    public void updateDifficultyAnalysis(String difficultyAnalysis, String trendAnalysis, String recommendedMethod) {
+        this.difficultyAnalysis = difficultyAnalysis;
+        this.trendAnalysis = trendAnalysis;
+        this.recommendedMethod = recommendedMethod;
+    }
+
+    public void updateFormativeAssessment(String formativeAssessment) {
+        this.formativeAssessment = formativeAssessment;
+    }
+
     public void update(String title, String purpose, Integer targetScore, Integer maxScore,
                        LocalDate startDate, LocalDate endDate, String studyMethod) {
-        this.title = title;
-        this.purpose = purpose;
-        this.targetScore = targetScore;
-        this.maxScore = maxScore;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.studyMethod = studyMethod;
+        if (title != null) this.title = title;
+        if (purpose != null) this.purpose = purpose;
+        if (targetScore != null) this.targetScore = targetScore;
+        if (maxScore != null) this.maxScore = maxScore;
+        if (startDate != null) this.startDate = startDate;
+        if (endDate != null) this.endDate = endDate;
+        if (studyMethod != null) this.studyMethod = studyMethod;
     }
 }
