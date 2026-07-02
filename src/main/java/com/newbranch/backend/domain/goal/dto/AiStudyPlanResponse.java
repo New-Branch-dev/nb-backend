@@ -35,7 +35,6 @@ public class AiStudyPlanResponse {
     public static class Task {
         private String startTime;
         private Integer durationMinutes;
-        private String category;
         private String activity;
         private String method;
     }

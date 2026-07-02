@@ -51,7 +51,9 @@ public class OpenAiClient {
                         Map.of("role", "system", "content", systemPrompt),
                         Map.of("role", "user", "content", userPrompt)
                 ),
-                "response_format", Map.of("type", "json_object")
+                "response_format", Map.of("type", "json_object"),
+                "temperature", 0.3,
+                "max_tokens", 4096
         );
     }
 
