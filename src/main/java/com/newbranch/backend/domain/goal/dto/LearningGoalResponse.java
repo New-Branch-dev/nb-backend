@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class LearningGoalResponse {
 
     private Long lgId;
@@ -19,19 +19,18 @@ public class LearningGoalResponse {
     private Integer maxScore;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String studyMethod;
-    private String difficultyAnalysis;
-    private String trendAnalysis;
-    private String recommendedMethod;
+    private List<String> methods;
+    private Boolean hasAiStudyPlan;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private List<MemorizationPlanResponse> memorizationPlans;
-    private List<RetrievalPlanResponse> retrievalPlans;
-    private List<StudyPlanResponse> studyPlans;
-    private List<DailyStudyTimeResponse> dailyStudyTimes;
+    private List<ByDayStudyTimeResponse> byDayStudyTimes;
+    private List<LocalDate> excludeDates;
 
-    public static LearningGoalResponse from(LearningGoal goal) {
+    /**
+     * 목록 조회용 응답 생성 (상세 정보 제외)
+     */
+    public static LearningGoalResponse from(LearningGoal goal, List<String> methods) {
         return LearningGoalResponse.builder()
                 .lgId(goal.getId())
                 .title(goal.getTitle())
@@ -40,39 +39,22 @@ public class LearningGoalResponse {
                 .maxScore(goal.getMaxScore())
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
-                .studyMethod(goal.getStudyMethod())
-                .difficultyAnalysis(goal.getDifficultyAnalysis())
-                .trendAnalysis(goal.getTrendAnalysis())
-                .recommendedMethod(goal.getRecommendedMethod())
+                .methods(methods)
+                .hasAiStudyPlan(goal.getAiStudyPlan() != null)
                 .createdAt(goal.getCreatedAt())
                 .updatedAt(goal.getUpdatedAt())
                 .build();
     }
 
-    public static LearningGoalResponse fromDetail(
-            LearningGoal goal,
-            List<MemorizationPlanResponse> memorizationPlans,
-            List<RetrievalPlanResponse> retrievalPlans,
-            List<StudyPlanResponse> studyPlans,
-            List<DailyStudyTimeResponse> dailyStudyTimes) {
-        return LearningGoalResponse.builder()
-                .lgId(goal.getId())
-                .title(goal.getTitle())
-                .purpose(goal.getPurpose())
-                .targetScore(goal.getTargetScore())
-                .maxScore(goal.getMaxScore())
-                .startDate(goal.getStartDate())
-                .endDate(goal.getEndDate())
-                .studyMethod(goal.getStudyMethod())
-                .difficultyAnalysis(goal.getDifficultyAnalysis())
-                .trendAnalysis(goal.getTrendAnalysis())
-                .recommendedMethod(goal.getRecommendedMethod())
-                .createdAt(goal.getCreatedAt())
-                .updatedAt(goal.getUpdatedAt())
-                .memorizationPlans(memorizationPlans)
-                .retrievalPlans(retrievalPlans)
-                .studyPlans(studyPlans)
-                .dailyStudyTimes(dailyStudyTimes)
+    /**
+     * 상세 조회용 응답 생성 (요일별 공부 시간, 제외 날짜 포함)
+     */
+    public static LearningGoalResponse fromDetail(LearningGoal goal, List<String> methods,
+                                                   List<ByDayStudyTimeResponse> byDayStudyTimes,
+                                                   List<LocalDate> excludeDates) {
+        return from(goal, methods).toBuilder()
+                .byDayStudyTimes(byDayStudyTimes)
+                .excludeDates(excludeDates)
                 .build();
     }
 }
