@@ -1,17 +1,17 @@
 package com.newbranch.backend.domain.mylearning.entity;
 
+import com.newbranch.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_learning_styles")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class UserLearningStyle {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserLearningStyle extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,20 +27,15 @@ public class UserLearningStyle {
     @Column(name = "recommended_method", length = 255)
     private String recommendedMethod;
 
-    @Builder.Default
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Builder
+    public UserLearningStyle(Long usersId, String learningStyle, String recommendedMethod) {
+        this.usersId = usersId;
+        this.learningStyle = learningStyle;
+        this.recommendedMethod = recommendedMethod;
+    }
 
-    @Builder.Default
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @Builder.Default
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    public void update(String learningStyle, String recommendedMethod) {
+        this.learningStyle = learningStyle;
+        this.recommendedMethod = recommendedMethod;
     }
 }

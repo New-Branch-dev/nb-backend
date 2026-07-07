@@ -20,6 +20,11 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User not found"),
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "U002", "User already exists"),
 
+    // MyLearning
+    MY_LEARNING_ALREADY_EXISTS(HttpStatus.CONFLICT, "M001", "My learning data already registered"),
+    USER_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "User setting not found"),
+    USER_LEARNING_STYLE_NOT_FOUND(HttpStatus.NOT_FOUND, "M003", "User learning style not found"),
+
     // Goal
     GOAL_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "Learning goal not found"),
     STUDY_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "G002", "Study plan not found"),

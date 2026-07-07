@@ -1,17 +1,17 @@
 package com.newbranch.backend.domain.mylearning.entity;
 
+import com.newbranch.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_settings")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class UserSetting {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserSetting extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,38 +27,68 @@ public class UserSetting {
     @Column(name = "off_days", length = 100)
     private String offDays;
 
-    @Column(name = "preferred_material_format", length = 100)
-    private String preferredMaterialFormat;
+    @Column(name = "interest_cd", length = 100)
+    private String interestCd;
 
-    @Column(name = "preferred_class_style", length = 100)
-    private String preferredClassStyle;
+    @Column(name = "aptitude_cd", length = 100)
+    private String aptitudeCd;
 
-    @Column(name = "preferred_study_method", length = 100)
-    private String preferredStudyMethod;
+    @Column(name = "personality_cd", length = 100)
+    private String personalityCd;
 
-    @Column(name = "preferred_teacher_style", length = 50)
-    private String preferredTeacherStyle;
+    @Column(name = "learning_disposition", length = 255)
+    private String learningDisposition;
 
-    @Column(name = "preferred_friend_style", length = 50)
-    private String preferredFriendStyle;
+    @Column(name = "preferred_data_format", length = 100)
+    private String preferredDataFormat;
 
-    @Column(name = "extra_notes", columnDefinition = "TEXT")
-    private String extraNotes;
+    @Column(name = "preferred_teaching_style", length = 100)
+    private String preferredTeachingStyle;
 
-    @Builder.Default
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "preferred_learning_method", length = 100)
+    private String preferredLearningMethod;
 
-    @Builder.Default
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "teacher_style", length = 100)
+    private String teacherStyle;
 
-    @Builder.Default
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @Column(name = "teammate_style", length = 100)
+    private String teammateStyle;
 
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    @Builder
+    public UserSetting(Long usersId, String preferredStudyTime, String offDays,
+                       String interestCd, String aptitudeCd, String personalityCd,
+                       String learningDisposition, String preferredDataFormat,
+                       String preferredTeachingStyle, String preferredLearningMethod,
+                       String teacherStyle, String teammateStyle) {
+        this.usersId = usersId;
+        this.preferredStudyTime = preferredStudyTime;
+        this.offDays = offDays;
+        this.interestCd = interestCd;
+        this.aptitudeCd = aptitudeCd;
+        this.personalityCd = personalityCd;
+        this.learningDisposition = learningDisposition;
+        this.preferredDataFormat = preferredDataFormat;
+        this.preferredTeachingStyle = preferredTeachingStyle;
+        this.preferredLearningMethod = preferredLearningMethod;
+        this.teacherStyle = teacherStyle;
+        this.teammateStyle = teammateStyle;
+    }
+
+    public void update(String preferredStudyTime, String offDays,
+                       String interestCd, String aptitudeCd, String personalityCd,
+                       String learningDisposition, String preferredDataFormat,
+                       String preferredTeachingStyle, String preferredLearningMethod,
+                       String teacherStyle, String teammateStyle) {
+        this.preferredStudyTime = preferredStudyTime;
+        this.offDays = offDays;
+        this.interestCd = interestCd;
+        this.aptitudeCd = aptitudeCd;
+        this.personalityCd = personalityCd;
+        this.learningDisposition = learningDisposition;
+        this.preferredDataFormat = preferredDataFormat;
+        this.preferredTeachingStyle = preferredTeachingStyle;
+        this.preferredLearningMethod = preferredLearningMethod;
+        this.teacherStyle = teacherStyle;
+        this.teammateStyle = teammateStyle;
     }
 }
