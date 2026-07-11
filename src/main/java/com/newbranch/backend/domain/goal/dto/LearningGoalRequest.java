@@ -11,7 +11,7 @@ import java.util.List;
 public class LearningGoalRequest {
 
     @NotNull
-    private List<Long> noteIds;
+    private List<Long> attachmentIds;
 
     @NotBlank
     private String title;
@@ -26,19 +26,17 @@ public class LearningGoalRequest {
 
     private LocalDate endDate;
 
-    private String studyMethod;
+    private List<String> methods;
 
-    private List<DailyStudyTimeEntry> dailyStudyTimes;
+    private List<ByDayStudyTimeEntry> byDayStudyTimes;
 
-    private MemorizationPlanRequest memorizationPlan;
-
-    private RetrievalPlanRequest retrievalPlan;
-
-    private StudyPlanRequest studyPlan;
+    private List<LocalDate> excludeDates;
 
     @Getter
-    public static class DailyStudyTimeEntry {
-        private LocalDate studyDate;
+    public static class ByDayStudyTimeEntry {
+        @NotNull
+        private Integer dayOfWeek;  // 1=월 ~ 7=일
+        @NotNull
         private Integer availableMinutes;
     }
 }

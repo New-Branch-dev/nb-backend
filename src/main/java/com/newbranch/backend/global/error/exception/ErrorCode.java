@@ -22,15 +22,11 @@ public enum ErrorCode {
 
     // Goal
     GOAL_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "Learning goal not found"),
-    STUDY_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "G002", "Study plan not found"),
-    RETRIEVAL_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "G003", "Retrieval plan not found"),
-    MEMORIZATION_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "G004", "Memorization plan not found"),
 
-    // Note
-    NOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "N001", "Note not found"),
-    NOTE_MATERIAL_NOT_FOUND(HttpStatus.NOT_FOUND, "N002", "Note material not found"),
-    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "N003", "Invalid file type. Allowed: PDF, PPT, Word, Audio"),
-    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "N004", "File upload failed"),
+    // Attachment
+    ATTACHMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "AT001", "Attachment not found"),
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "AT002", "Invalid file type. Allowed: PDF, PPT, Word, Audio"),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AT003", "File upload failed"),
 
     // Authentication & Authorization
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "Authentication is required"),
@@ -38,6 +34,10 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "A003", "Refresh token not found"),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A004", "Refresh token expired"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A005", "Invalid email or password"),
+
+    // AI
+    AI_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI001", "AI service error"),
+    AI_PLAN_NOT_FOUND(HttpStatus.NOT_FOUND, "AI002", "AI study plan not found"),
 
     // Email Verification
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "E001", "Invalid verification token"),

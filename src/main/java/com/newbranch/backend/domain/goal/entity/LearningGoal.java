@@ -41,26 +41,20 @@ public class LearningGoal extends BaseEntity {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "study_method")
-    private String studyMethod;
+    @Column(name = "ai_study_plan", columnDefinition = "TEXT")
+    private String aiStudyPlan;
 
-    @Column(name = "difficulty_analysis", columnDefinition = "TEXT")
-    private String difficultyAnalysis;
-
-    @Column(name = "trend_analysis", columnDefinition = "TEXT")
-    private String trendAnalysis;
-
-    @Column(name = "recommended_method", columnDefinition = "TEXT")
-    private String recommendedMethod;
+    public void updateAiStudyPlan(String aiStudyPlan) {
+        this.aiStudyPlan = aiStudyPlan;
+    }
 
     public void update(String title, String purpose, Integer targetScore, Integer maxScore,
-                       LocalDate startDate, LocalDate endDate, String studyMethod) {
-        this.title = title;
-        this.purpose = purpose;
-        this.targetScore = targetScore;
-        this.maxScore = maxScore;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.studyMethod = studyMethod;
+                       LocalDate startDate, LocalDate endDate) {
+        if (title != null) this.title = title;
+        if (purpose != null) this.purpose = purpose;
+        if (targetScore != null) this.targetScore = targetScore;
+        if (maxScore != null) this.maxScore = maxScore;
+        if (startDate != null) this.startDate = startDate;
+        if (endDate != null) this.endDate = endDate;
     }
 }
