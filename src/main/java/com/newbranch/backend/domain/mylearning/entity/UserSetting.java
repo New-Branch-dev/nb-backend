@@ -1,17 +1,17 @@
 package com.newbranch.backend.domain.mylearning.entity;
 
+import com.newbranch.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_settings")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class UserSetting {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserSetting extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,20 +45,33 @@ public class UserSetting {
     @Column(name = "extra_notes", columnDefinition = "TEXT")
     private String extraNotes;
 
-    @Builder.Default
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Builder
+    public UserSetting(Long usersId, String preferredStudyTime, String offDays,
+                        String preferredMaterialFormat, String preferredClassStyle,
+                        String preferredStudyMethod, String preferredTeacherStyle,
+                        String preferredFriendStyle, String extraNotes) {
+        this.usersId = usersId;
+        this.preferredStudyTime = preferredStudyTime;
+        this.offDays = offDays;
+        this.preferredMaterialFormat = preferredMaterialFormat;
+        this.preferredClassStyle = preferredClassStyle;
+        this.preferredStudyMethod = preferredStudyMethod;
+        this.preferredTeacherStyle = preferredTeacherStyle;
+        this.preferredFriendStyle = preferredFriendStyle;
+        this.extraNotes = extraNotes;
+    }
 
-    @Builder.Default
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @Builder.Default
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    public void update(String preferredStudyTime, String offDays,
+                        String preferredMaterialFormat, String preferredClassStyle,
+                        String preferredStudyMethod, String preferredTeacherStyle,
+                        String preferredFriendStyle, String extraNotes) {
+        this.preferredStudyTime = preferredStudyTime;
+        this.offDays = offDays;
+        this.preferredMaterialFormat = preferredMaterialFormat;
+        this.preferredClassStyle = preferredClassStyle;
+        this.preferredStudyMethod = preferredStudyMethod;
+        this.preferredTeacherStyle = preferredTeacherStyle;
+        this.preferredFriendStyle = preferredFriendStyle;
+        this.extraNotes = extraNotes;
     }
 }
