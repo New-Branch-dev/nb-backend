@@ -28,6 +28,9 @@ public enum ErrorCode {
     // Goal
     GOAL_NOT_FOUND(HttpStatus.NOT_FOUND, "G001", "Learning goal not found"),
 
+    // Consolidation
+    CONSOLIDATION_NOT_FOUND(HttpStatus.NOT_FOUND, "CO001", "Consolidation not found"),
+
     // Attachment
     ATTACHMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "AT001", "Attachment not found"),
     INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "AT002", "Invalid file type. Allowed: PDF, PPT, Word, Audio"),
