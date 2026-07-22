@@ -9,14 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * 이메일 발송 서비스
@@ -41,7 +39,6 @@ public class EmailService {
     /**
      * 이메일 인증 메일을 발송합니다
      */
-    @Async
     @Transactional
     public void sendVerificationEmail(String email) {
         String token = generateVerificationToken();
@@ -55,12 +52,11 @@ public class EmailService {
 
         emailVerificationRepository.save(emailVerification);
 
-        String verificationUrl = baseUrl + "/api/v1/auth/verify-email?token=" + token;
-        String subject = "[NewBranch] 이메일 인증을 완료해주세요";
-        String content = buildVerificationEmailContent(verificationUrl);
+        String subject = "[NewBranch] 회원가입 이메일 인증번호입니다.";
+        String content = buildVerificationEmailContent(token);
 
         sendEmail(email, subject, content);
-        log.info("Verification email sent to: {}", email);
+        log.info("Verification code [{}] sent to: {}", token, email);
     }
 
     /**
@@ -81,6 +77,30 @@ public class EmailService {
 
         emailVerification.verify();
         log.info("Email verified: {}", emailVerification.getEmail());
+    }
+
+    /**
+     * 프론트엔드 화면에서 입력한 이메일과 인증번호를 실시간 검증합니다
+     */
+    @Transactional
+    public void verifyEmailCode(String email, String token) {
+        EmailVerification emailVerification = emailVerificationRepository.findTopByEmailOrderByCreatedAtDesc(email)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_VERIFICATION_TOKEN));
+
+        if (!emailVerification.getToken().equals(token)) {
+            throw new BusinessException(ErrorCode.INVALID_VERIFICATION_TOKEN);
+        }
+
+        if (emailVerification.isVerified()) {
+            throw new BusinessException(ErrorCode.ALREADY_VERIFIED_EMAIL);
+        }
+
+        if (emailVerification.isExpired()) {
+            throw new BusinessException(ErrorCode.EXPIRED_VERIFICATION_TOKEN);
+        }
+
+        emailVerification.verify();
+        log.info("Email successfully verified via code: {}", email);
     }
 
     /**
@@ -124,53 +144,32 @@ public class EmailService {
     }
 
     /**
-     * 이메일 인증 토큰을 생성합니다
+     * 6자리 숫자 인증번호를 생성합니다
      */
     private String generateVerificationToken() {
-        return UUID.randomUUID().toString();
+        return String.valueOf((int) (Math.random() * 899999) + 100000);
     }
 
     /**
      * 이메일 인증 메일 내용을 생성합니다
      */
-    private String buildVerificationEmailContent(String verificationUrl) {
+    private String buildVerificationEmailContent(String token) {
         return """
                 <!DOCTYPE html>
                 <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; }
-                        .content { padding: 20px; background-color: #f9f9f9; }
-                        .button { display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
-                        .footer { text-align: center; padding: 20px; color: #777; font-size: 12px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>NewBranch 이메일 인증</h1>
+                    <head><meta charset="UTF-8"></head>
+                    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+                            <h2 style="color: #6641DF; text-align: center;">NewBranch 이메일 인증</h2>
+                            <p>안녕하세요, NewBranch에 가입해 주셔서 감사합니다.</p>
+                            <p>화면의 인증번호 입력란에 아래 6자리 코드를 입력해주세요.</p>
+                            <div style="background-color: #f3efff; padding: 20px; text-align: center; margin: 20px 0; border-radius: 4px;">
+                                <span style="font-size: 32px; font-weight: bold; color: #6641DF; letter-spacing: 5px;">%s</span>
                         </div>
-                        <div class="content">
-                            <p>안녕하세요,</p>
-                            <p>NewBranch에 가입해 주셔서 감사합니다.</p>
-                            <p>아래 버튼을 클릭하여 이메일 인증을 완료해주세요.</p>
-                            <div style="text-align: center;">
-                                <a href="%s" class="button">이메일 인증하기</a>
-                            </div>
-                            <p>또는 아래 링크를 복사하여 브라우저에 붙여넣으세요:</p>
-                            <p style="word-break: break-all; color: #666;">%s</p>
-                            <p style="color: #999; font-size: 14px;">이 링크는 24시간 동안 유효합니다.</p>
-                        </div>
-                        <div class="footer">
-                            <p>본 메일은 발신 전용입니다.</p>
-                            <p>&copy; 2024 NewBranch. All rights reserved.</p>
-                        </div>
+                         <p style="color: #999; font-size: 13px;">본 인증번호는 3분 동안 유효합니다.</p>
                     </div>
                 </body>
                 </html>
-                """.formatted(verificationUrl, verificationUrl);
+                """.formatted(token);
     }
 }
