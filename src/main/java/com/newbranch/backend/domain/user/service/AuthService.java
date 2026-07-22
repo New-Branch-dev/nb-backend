@@ -46,6 +46,7 @@ public class AuthService {
     @Transactional
     public UserResponse signup(SignupRequest request) {
         validateDuplicateEmail(request.getEmail());
+        validateDuplicateLoginId(request.getLoginId());
 
         User user = User.builder()
                 .loginId(request.getLoginId())
@@ -82,14 +83,14 @@ public class AuthService {
     public TokenResponse refresh(String refreshToken) {
         validateRefreshToken(refreshToken);
 
-        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
-        String storedToken = getStoredRefreshToken(email);
+        String loginId = jwtTokenProvider.getEmailFromToken(refreshToken);
+        String storedToken = getStoredRefreshToken(loginId);
 
         if (!refreshToken.equals(storedToken)) {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
-        User user = getUserByEmail(email);
+        User user = getActiveUserByLoginId(loginId);
         Authentication authentication = createAuthentication(user);
 
         return generateTokens(authentication);
@@ -111,7 +112,7 @@ public class AuthService {
         emailService.verifyEmail(token);
 
         String email = emailService.getEmailFromToken(token);
-        User user = getUserByEmail(email);
+        User user = getActiveUserByEmail(email);
         user.verifyEmail();
 
         log.info("User email verified: {}", email);
@@ -172,19 +173,34 @@ public class AuthService {
     }
 
     /**
-     * Refresh Token을 검증합니다
+     * 회원가입 시 아이디 중복을 검증합니다
      */
-    private void validateRefreshToken(String token) {
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+    private void validateDuplicateLoginId(String loginId) {
+        if (userRepository.existsByLoginId(loginId)) {
+            throw new BusinessException(ErrorCode.USER_ALREADY_EXISTS);
         }
     }
 
     /**
-     * 이메일로 사용자를 조회합니다
+     * Refresh Token을 검증합니다
      */
-    private User getUserByEmail(String email) {
-        return userRepository.findByLoginIdAndIsActiveTrue(email)
+    private void validateRefreshToken(String token) {
+        jwtTokenProvider.validateRefreshTokenOrThrow(token);
+    }
+
+    /**
+     * 아이디로 활성화된 사용자를 조회합니다
+     */
+    private User getActiveUserByLoginId(String loginId) {
+        return userRepository.findByLoginIdAndIsActiveTrue(loginId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    /**
+     * 이메일로 활성화된 사용자를 조회합니다
+     */
+    private User getActiveUserByEmail(String email) {
+        return userRepository.findByEmailAndIsActiveTrue(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 
@@ -192,7 +208,7 @@ public class AuthService {
      * 사용자 인증 객체를 생성합니다
      */
     private Authentication createAuthentication(User user) {
-        return new UsernamePasswordAuthenticationToken(user.getEmail(), null,
+        return new UsernamePasswordAuthenticationToken(user.getLoginId(), null,
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getKey())));
     }
 
