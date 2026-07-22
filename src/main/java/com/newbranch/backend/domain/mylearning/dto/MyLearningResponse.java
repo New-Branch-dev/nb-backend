@@ -2,7 +2,6 @@ package com.newbranch.backend.domain.mylearning.dto;
 
 import com.newbranch.backend.domain.mylearning.entity.UserLearningStyle;
 import com.newbranch.backend.domain.mylearning.entity.UserSetting;
-import com.newbranch.backend.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -68,22 +67,17 @@ public class MyLearningResponse {
     @Schema(description = "추천 학습법")
     private String recommendedMethod;
 
-    public static MyLearningResponse of(User user, UserSetting setting, UserLearningStyle style) {
+    public static MyLearningResponse of(UserSetting setting, UserLearningStyle style) {
         return MyLearningResponse.builder()
-                .usersId(user.getId())
-                .nickname(user.getNickname())
-                .schoolName(user.getSchoolName())
+                .usersId(setting.getUsersId())
                 .preferredStudyTime(setting.getPreferredStudyTime())
                 .offDays(setting.getOffDays())
-                .interestCd(setting.getInterestCd())
-                .aptitudeCd(setting.getAptitudeCd())
-                .personalityCd(setting.getPersonalityCd())
-                .learningDisposition(setting.getLearningDisposition())
-                .preferredDataFormat(setting.getPreferredDataFormat())
-                .preferredTeachingStyle(setting.getPreferredTeachingStyle())
-                .preferredLearningMethod(setting.getPreferredLearningMethod())
-                .teacherStyle(setting.getTeacherStyle())
-                .teammateStyle(setting.getTeammateStyle())
+                .preferredMaterialFormat(setting.getPreferredMaterialFormat())
+                .preferredClassStyle(setting.getPreferredClassStyle())
+                .preferredStudyMethod(setting.getPreferredStudyMethod())
+                .preferredTeacherStyle(setting.getPreferredTeacherStyle())
+                .preferredFriendStyle(setting.getPreferredFriendStyle())
+                .extraNotes(setting.getExtraNotes())
                 .learningStyle(style.getLearningStyle())
                 .recommendedMethod(style.getRecommendedMethod())
                 .build();

@@ -3,9 +3,11 @@ package com.newbranch.backend.domain.mylearning.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @Schema(description = "나만의 학습 등록/수정 요청")
 public class MyLearningRequest {
 
@@ -39,7 +41,7 @@ public class MyLearningRequest {
     private String preferredStudyMethod;
 
     @Schema(description = "선호 선생님 스타일", example = "STRICT")
-    private String preferredTeacherStyle;;
+    private String preferredTeacherStyle;
 
     @Schema(description = "선호 친구 스타일", example = "COOPERATIVE")
     private String preferredFriendStyle;
