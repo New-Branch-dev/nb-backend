@@ -47,9 +47,9 @@ public class UserSetting extends BaseEntity {
 
     @Builder
     public UserSetting(Long usersId, String preferredStudyTime, String offDays,
-                        String preferredMaterialFormat, String preferredClassStyle,
-                        String preferredStudyMethod, String preferredTeacherStyle,
-                        String preferredFriendStyle, String extraNotes) {
+                       String preferredMaterialFormat, String preferredClassStyle,
+                       String preferredStudyMethod, String preferredTeacherStyle,
+                       String preferredFriendStyle, String extraNotes) {
         this.usersId = usersId;
         this.preferredStudyTime = preferredStudyTime;
         this.offDays = offDays;
@@ -62,9 +62,9 @@ public class UserSetting extends BaseEntity {
     }
 
     public void update(String preferredStudyTime, String offDays,
-                        String preferredMaterialFormat, String preferredClassStyle,
-                        String preferredStudyMethod, String preferredTeacherStyle,
-                        String preferredFriendStyle, String extraNotes) {
+                       String preferredMaterialFormat, String preferredClassStyle,
+                       String preferredStudyMethod, String preferredTeacherStyle,
+                       String preferredFriendStyle, String extraNotes) {
         this.preferredStudyTime = preferredStudyTime;
         this.offDays = offDays;
         this.preferredMaterialFormat = preferredMaterialFormat;

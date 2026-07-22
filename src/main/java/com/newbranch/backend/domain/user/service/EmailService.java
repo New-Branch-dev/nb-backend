@@ -37,8 +37,7 @@ public class EmailService {
     private Long verificationExpiration;
 
     /**
-     * 6자리 인증번호 메일을 발송합니다
-     * 메일 발송에 실패하면 예외를 던져 호출자의 트랜잭션(예: 회원가입)이 롤백되도록 합니다
+     * 이메일 인증 메일을 발송합니다
      */
     @Transactional
     public void sendVerificationEmail(String email) {
@@ -152,22 +151,22 @@ public class EmailService {
     }
 
     /**
-     * 인증번호 메일 내용을 생성합니다
+     * 이메일 인증 메일 내용을 생성합니다
      */
     private String buildVerificationEmailContent(String token) {
         return """
                 <!DOCTYPE html>
                 <html>
-                <head><meta charset="UTF-8"></head>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-                        <h2 style="color: #6641DF; text-align: center;">NewBranch 이메일 인증</h2>
-                        <p>안녕하세요, NewBranch에 가입해 주셔서 감사합니다.</p>
-                        <p>화면의 인증번호 입력란에 아래 6자리 코드를 입력해주세요.</p>
-                        <div style="background-color: #f3efff; padding: 20px; text-align: center; margin: 20px 0; border-radius: 4px;">
-                            <span style="font-size: 32px; font-weight: bold; color: #6641DF; letter-spacing: 5px;">%s</span>
+                    <head><meta charset="UTF-8"></head>
+                    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+                            <h2 style="color: #6641DF; text-align: center;">NewBranch 이메일 인증</h2>
+                            <p>안녕하세요, NewBranch에 가입해 주셔서 감사합니다.</p>
+                            <p>화면의 인증번호 입력란에 아래 6자리 코드를 입력해주세요.</p>
+                            <div style="background-color: #f3efff; padding: 20px; text-align: center; margin: 20px 0; border-radius: 4px;">
+                                <span style="font-size: 32px; font-weight: bold; color: #6641DF; letter-spacing: 5px;">%s</span>
                         </div>
-                        <p style="color: #999; font-size: 13px;">본 인증번호는 3분 동안 유효합니다.</p>
+                         <p style="color: #999; font-size: 13px;">본 인증번호는 3분 동안 유효합니다.</p>
                     </div>
                 </body>
                 </html>

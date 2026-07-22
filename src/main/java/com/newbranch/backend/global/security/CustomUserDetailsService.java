@@ -16,7 +16,7 @@ import java.util.Collections;
 
 /**
  * Spring Security UserDetailsService 구현
- * 이메일로 사용자를 조회하여 인증에 사용
+ * 사용자 아이디로 사용자를 조회하여 인증에 사용
  */
 @Service
 @RequiredArgsConstructor
@@ -25,16 +25,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     /**
-     * 이메일로 사용자를 조회합니다
+     * 사용자아이디로 사용자를 조회합니다
      */
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmailAndIsActiveTrue(email)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByLoginIdAndIsActiveTrue(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                user.getLoginId(),
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getKey()))
         );

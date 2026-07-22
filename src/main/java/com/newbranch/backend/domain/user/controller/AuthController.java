@@ -77,4 +77,35 @@ public class AuthController {
         authService.verifyEmail(token);
         return ApiResponse.success();
     }
+
+    /**
+     * 이메일 인증번호 발송 요청
+     */
+    @Operation(summary = "이메일 인증번호 발송", description = "입력한 이메일로 6자리 인증번호를 발송합니다")
+    @PostMapping("/email/request")
+    public ApiResponse<Void> requestEmailVerification(@RequestParam String email) {
+        authService.validateDuplicateEmail(email);
+        emailService.sendVerificationEmail(email);
+        return ApiResponse.success();
+    }
+
+    /**
+     * 이메일 인증번호 검증 확인
+     */
+    @Operation(summary = "이메일 인증번호 검증", description = "사용자가 입력한 6자리 인증번호를 검증합니다")
+    @PostMapping("/email/verify")
+    public ApiResponse<Void> verifyEmailCode(@RequestParam String email, @RequestParam String code) {
+        emailService.verifyEmailCode(email, code);
+        return ApiResponse.success();
+    }
+
+    /**
+     * 아이디 중복 확인
+     */
+    @Operation(summary = "아이디 중복 확인", description = "입력한 아이디가 이미 존재하는지 확인합니다")
+    @GetMapping("/check-userid")
+    public ApiResponse<Boolean> checkUserid(@RequestParam String loginId) {
+        boolean isDuplicate = authService.validateDuplicateUserId(loginId);
+        return ApiResponse.success(isDuplicate);
+    }
 }

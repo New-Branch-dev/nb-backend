@@ -10,6 +10,11 @@ import lombok.Getter;
 @Schema(description = "회원가입 요청")
 public class SignupRequest {
 
+    @NotBlank(message = "아이디는 필수입니다")
+    @Size(min=5, max=15, message = "아이디는 최소 5자 이상, 15자 이하여야 합니다.")
+    @Schema(description = "아이디", example = "user")
+    private String loginId;
+
     @NotBlank(message = "이메일은 필수입니다")
     @Email(message = "올바른 이메일 형식이 아닙니다")
     @Schema(description = "이메일", example = "user@example.com")
