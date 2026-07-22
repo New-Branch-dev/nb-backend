@@ -2,7 +2,6 @@ package com.newbranch.backend.domain.user.controller;
 
 import com.newbranch.backend.domain.user.dto.*;
 import com.newbranch.backend.domain.user.service.AuthService;
-import com.newbranch.backend.domain.user.service.EmailService;
 import com.newbranch.backend.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final EmailService emailService;
 
     /**
      * 회원가입
