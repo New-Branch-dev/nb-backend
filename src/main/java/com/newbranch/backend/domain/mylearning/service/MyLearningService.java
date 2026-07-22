@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -84,17 +82,11 @@ public class MyLearningService {
         UserLearningStyle style = userLearningStyleRepository.findByUsersIdAndIsActiveTrue(usersId)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 학습유형 정보가 존재하지 않습니다. ID: " + usersId));
 
-        setting.setPreferredStudyTime(dto.getPreferredStudyTime());
-        setting.setOffDays(dto.getOffDays());
-        setting.setPreferredMaterialFormat(dto.getPreferredMaterialFormat());
-        setting.setPreferredClassStyle(dto.getPreferredClassStyle());
-        setting.setPreferredStudyMethod(dto.getPreferredStudyMethod());
-        setting.setPreferredTeacherStyle(dto.getPreferredTeacherStyle());
-        setting.setPreferredFriendStyle(dto.getPreferredFriendStyle());
-        setting.setExtraNotes(dto.getExtraNotes());
+        setting.update(dto.getPreferredStudyTime(), dto.getOffDays(), dto.getPreferredMaterialFormat(),
+                dto.getPreferredClassStyle(), dto.getPreferredStudyMethod(), dto.getPreferredTeacherStyle(),
+                dto.getPreferredFriendStyle(), dto.getExtraNotes());
 
-        style.setLearningStyle(dto.getLearningStyle());
-        style.setRecommendedMethod(dto.getRecommendedMethod());
+        style.update(dto.getLearningStyle(), dto.getRecommendedMethod());
 
         return dto;
     }
@@ -110,7 +102,7 @@ public class MyLearningService {
         UserLearningStyle style = userLearningStyleRepository.findByUsersIdAndIsActiveTrue(usersId)
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 학습유형 정보가 존재하지 않습니다. ID: " + usersId));
 
-        setting.setIsActive(false);
-        style.setIsActive(false);
+        setting.deactivate();
+        style.deactivate();
     }
 }

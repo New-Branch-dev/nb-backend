@@ -27,68 +27,51 @@ public class UserSetting extends BaseEntity {
     @Column(name = "off_days", length = 100)
     private String offDays;
 
-    @Column(name = "interest_cd", length = 100)
-    private String interestCd;
+    @Column(name = "preferred_material_format", length = 100)
+    private String preferredMaterialFormat;
 
-    @Column(name = "aptitude_cd", length = 100)
-    private String aptitudeCd;
+    @Column(name = "preferred_class_style", length = 100)
+    private String preferredClassStyle;
 
-    @Column(name = "personality_cd", length = 100)
-    private String personalityCd;
+    @Column(name = "preferred_study_method", length = 100)
+    private String preferredStudyMethod;
 
-    @Column(name = "learning_disposition", length = 255)
-    private String learningDisposition;
+    @Column(name = "preferred_teacher_style", length = 50)
+    private String preferredTeacherStyle;
 
-    @Column(name = "preferred_data_format", length = 100)
-    private String preferredDataFormat;
+    @Column(name = "preferred_friend_style", length = 50)
+    private String preferredFriendStyle;
 
-    @Column(name = "preferred_teaching_style", length = 100)
-    private String preferredTeachingStyle;
-
-    @Column(name = "preferred_learning_method", length = 100)
-    private String preferredLearningMethod;
-
-    @Column(name = "teacher_style", length = 100)
-    private String teacherStyle;
-
-    @Column(name = "teammate_style", length = 100)
-    private String teammateStyle;
+    @Column(name = "extra_notes", columnDefinition = "TEXT")
+    private String extraNotes;
 
     @Builder
     public UserSetting(Long usersId, String preferredStudyTime, String offDays,
-                       String interestCd, String aptitudeCd, String personalityCd,
-                       String learningDisposition, String preferredDataFormat,
-                       String preferredTeachingStyle, String preferredLearningMethod,
-                       String teacherStyle, String teammateStyle) {
+                       String preferredMaterialFormat, String preferredClassStyle,
+                       String preferredStudyMethod, String preferredTeacherStyle,
+                       String preferredFriendStyle, String extraNotes) {
         this.usersId = usersId;
         this.preferredStudyTime = preferredStudyTime;
         this.offDays = offDays;
-        this.interestCd = interestCd;
-        this.aptitudeCd = aptitudeCd;
-        this.personalityCd = personalityCd;
-        this.learningDisposition = learningDisposition;
-        this.preferredDataFormat = preferredDataFormat;
-        this.preferredTeachingStyle = preferredTeachingStyle;
-        this.preferredLearningMethod = preferredLearningMethod;
-        this.teacherStyle = teacherStyle;
-        this.teammateStyle = teammateStyle;
+        this.preferredMaterialFormat = preferredMaterialFormat;
+        this.preferredClassStyle = preferredClassStyle;
+        this.preferredStudyMethod = preferredStudyMethod;
+        this.preferredTeacherStyle = preferredTeacherStyle;
+        this.preferredFriendStyle = preferredFriendStyle;
+        this.extraNotes = extraNotes;
     }
 
     public void update(String preferredStudyTime, String offDays,
-                       String interestCd, String aptitudeCd, String personalityCd,
-                       String learningDisposition, String preferredDataFormat,
-                       String preferredTeachingStyle, String preferredLearningMethod,
-                       String teacherStyle, String teammateStyle) {
+                       String preferredMaterialFormat, String preferredClassStyle,
+                       String preferredStudyMethod, String preferredTeacherStyle,
+                       String preferredFriendStyle, String extraNotes) {
         this.preferredStudyTime = preferredStudyTime;
         this.offDays = offDays;
-        this.interestCd = interestCd;
-        this.aptitudeCd = aptitudeCd;
-        this.personalityCd = personalityCd;
-        this.learningDisposition = learningDisposition;
-        this.preferredDataFormat = preferredDataFormat;
-        this.preferredTeachingStyle = preferredTeachingStyle;
-        this.preferredLearningMethod = preferredLearningMethod;
-        this.teacherStyle = teacherStyle;
-        this.teammateStyle = teammateStyle;
+        this.preferredMaterialFormat = preferredMaterialFormat;
+        this.preferredClassStyle = preferredClassStyle;
+        this.preferredStudyMethod = preferredStudyMethod;
+        this.preferredTeacherStyle = preferredTeacherStyle;
+        this.preferredFriendStyle = preferredFriendStyle;
+        this.extraNotes = extraNotes;
     }
 }
