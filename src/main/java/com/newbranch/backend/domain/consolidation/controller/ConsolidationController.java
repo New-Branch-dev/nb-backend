@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,7 @@ public class ConsolidationController {
 
     @Operation(summary = "단권화 등록", description = "단권화 메인 정보, 첨부파일 매핑, 하위 자료를 함께 등록합니다")
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<ConsolidationResponse> createConsolidation(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody ConsolidationRequest request) {

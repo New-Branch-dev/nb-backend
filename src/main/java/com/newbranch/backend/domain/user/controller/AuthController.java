@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ public class AuthController {
      */
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다")
     @PostMapping("/signup")
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<UserResponse> signup(@Valid @RequestBody SignupRequest request) {
         UserResponse response = authService.signup(request);
         return ApiResponse.success(response);

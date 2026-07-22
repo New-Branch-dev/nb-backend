@@ -1,5 +1,8 @@
 package com.newbranch.backend.domain.goal.dto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -28,6 +31,7 @@ public class LearningGoalRequest {
 
     private List<String> methods;
 
+    @Valid
     private List<ByDayStudyTimeEntry> byDayStudyTimes;
 
     private List<LocalDate> excludeDates;
@@ -35,8 +39,12 @@ public class LearningGoalRequest {
     @Getter
     public static class ByDayStudyTimeEntry {
         @NotNull
+        @Min(1)
+        @Max(7)
         private Integer dayOfWeek;  // 1=월 ~ 7=일
         @NotNull
+        @Min(0)
+        @Max(1440)
         private Integer availableMinutes;
     }
 }

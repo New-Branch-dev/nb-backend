@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,6 +42,7 @@ public class AttachmentController {
 
     @Operation(summary = "파일 업로드 (PDF, PPT, Word)")
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<List<AttachmentResponse>> uploadFiles(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestPart("files") List<MultipartFile> files) {
@@ -49,6 +51,7 @@ public class AttachmentController {
 
     @Operation(summary = "강의 녹음 업로드")
     @PostMapping(value = "/lecture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<AttachmentResponse> uploadLecture(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestPart("file") MultipartFile file) {
@@ -57,6 +60,7 @@ public class AttachmentController {
 
     @Operation(summary = "URL 저장 (VIDEO, WEB)")
     @PostMapping("/url")
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<AttachmentResponse> saveUrl(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody AttachmentUrlRequest request) {
@@ -65,6 +69,7 @@ public class AttachmentController {
 
     @Operation(summary = "텍스트 저장")
     @PostMapping("/text")
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<AttachmentResponse> saveText(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody AttachmentTextRequest request) {

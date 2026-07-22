@@ -15,8 +15,8 @@ public class UserQueryService {
 
     private final UserRepository userRepository;
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
+    public User findByLoginId(String loginId) {
+        return userRepository.findByLoginIdAndIsActiveTrue(loginId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 }

@@ -40,7 +40,7 @@ public class ConsolidationService {
      * 사용자의 활성 단권화 목록을 최신순으로 조회합니다.
      */
     public List<ConsolidationResponse> getConsolidations(String email) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         return consolidationRepository.findAllByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
                 .stream()
                 .map(ConsolidationResponse::from)
@@ -51,7 +51,7 @@ public class ConsolidationService {
      * 단권화 상세 정보를 조회합니다 (하위 자료, 매핑된 첨부파일 포함).
      */
     public ConsolidationResponse getConsolidation(String email, Long coId) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         Consolidation consolidation = findByIdAndUser(coId, user);
 
         List<ConsolidationMaterial> materials = fetchMaterials(consolidation);
@@ -66,7 +66,7 @@ public class ConsolidationService {
      */
     @Transactional
     public ConsolidationResponse createConsolidation(String email, ConsolidationRequest request) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         LearningGoal goal = learningGoalService.findGoalByIdAndUser(request.getLgId(), user);
         List<Attachment> attachments = validateAndFetchAttachments(request.getAttachmentIds(), user);
 
@@ -95,7 +95,7 @@ public class ConsolidationService {
      */
     @Transactional
     public ConsolidationResponse updateConsolidation(String email, Long coId, ConsolidationRequest request) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         Consolidation consolidation = findByIdAndUser(coId, user);
 
         consolidation.update(request.getTitle(), request.getArticle(), request.getMode(),
@@ -116,7 +116,7 @@ public class ConsolidationService {
      */
     @Transactional
     public void deleteConsolidation(String email, Long coId) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         findByIdAndUser(coId, user).deactivate();
     }
 

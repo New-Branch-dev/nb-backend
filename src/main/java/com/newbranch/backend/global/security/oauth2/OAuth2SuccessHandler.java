@@ -8,10 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Collections;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -40,13 +43,21 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         OAuth2UserPrincipal principal = (OAuth2UserPrincipal) authentication.getPrincipal();
-        String email = principal.getEmail();
+        String loginId = principal.getUser().getLoginId();
         String nickname = URLEncoder.encode(principal.getUser().getNickname(), StandardCharsets.UTF_8);
 
-        String accessToken = jwtTokenProvider.createAccessToken(authentication);
-        String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+        // JWT subject / Redis 키는 시스템 전반에서 loginId를 기준으로 삼으므로(일반 로그인·refresh·
+        // JwtAuthenticationFilter 전부 loginId 기준), OAuth2User의 getName()(Google sub 값)을 그대로
+        // 쓰지 않고 loginId로 새 Authentication을 만들어 토큰을 발급한다.
+        Authentication tokenAuthentication = new UsernamePasswordAuthenticationToken(
+                loginId, null, Collections.singletonList(
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                                principal.getUser().getRole().getKey())));
 
-        storeRefreshToken(email, refreshToken);
+        String accessToken = jwtTokenProvider.createAccessToken(tokenAuthentication);
+        String refreshToken = jwtTokenProvider.createRefreshToken(tokenAuthentication);
+
+        storeRefreshToken(loginId, refreshToken);
 
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("accessToken", accessToken)
@@ -55,15 +66,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build()
                 .toUriString();
 
-        log.info("OAuth2 login success for user: {}", email);
+        log.info("OAuth2 login success for user: {}", loginId);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
     /**
      * Refresh Token을 Redis에 저장합니다
      */
-    private void storeRefreshToken(String email, String token) {
-        String key = REFRESH_TOKEN_PREFIX + email;
+    private void storeRefreshToken(String loginId, String token) {
+        String key = REFRESH_TOKEN_PREFIX + loginId;
         redisTemplate.opsForValue().set(key, token,
                 jwtProperties.getRefreshTokenExpiration(), TimeUnit.MILLISECONDS);
     }
