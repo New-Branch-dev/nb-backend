@@ -192,7 +192,7 @@ public class AuthService {
      * 사용자 인증 객체를 생성합니다
      */
     private Authentication createAuthentication(User user) {
-        return new UsernamePasswordAuthenticationToken(user.getEmail(), null,
+        return new UsernamePasswordAuthenticationToken(user.getLoginId(), null,
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getKey())));
     }
 
