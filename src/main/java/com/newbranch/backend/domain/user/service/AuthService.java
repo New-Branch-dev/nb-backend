@@ -184,7 +184,7 @@ public class AuthService {
      * 이메일로 사용자를 조회합니다
      */
     private User getUserByEmail(String email) {
-        return userRepository.findByLoginIdAndIsActiveTrue(email)
+        return userRepository.findByEmailAndIsActiveTrue(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 
