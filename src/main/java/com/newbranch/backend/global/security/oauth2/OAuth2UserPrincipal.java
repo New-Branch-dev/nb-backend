@@ -38,7 +38,7 @@ public class OAuth2UserPrincipal implements OAuth2User {
 
     @Override
     public String getName() {
-        return String.valueOf(attributes.get(nameAttributeKey));
+        return user.getEmail();
     }
 
     public String getEmail() {

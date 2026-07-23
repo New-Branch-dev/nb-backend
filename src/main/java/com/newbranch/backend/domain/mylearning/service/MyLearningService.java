@@ -5,6 +5,8 @@ import com.newbranch.backend.domain.mylearning.entity.UserLearningStyle;
 import com.newbranch.backend.domain.mylearning.entity.UserSetting;
 import com.newbranch.backend.domain.mylearning.repository.UserLearningStyleRepository;
 import com.newbranch.backend.domain.mylearning.repository.UserSettingRepository;
+import com.newbranch.backend.domain.user.entity.User;
+import com.newbranch.backend.domain.user.repository.UserRepository;
 import com.newbranch.backend.global.error.exception.BusinessException;
 import com.newbranch.backend.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MyLearningService {
 
+    private final UserRepository userRepository;
     private final UserSettingRepository userSettingRepository;
     private final UserLearningStyleRepository userLearningStyleRepository;
 
@@ -53,6 +56,11 @@ public class MyLearningService {
             throw new BusinessException(ErrorCode.MY_LEARNING_ALREADY_EXISTS);
         }
 
+        User user = userRepository.findById(dto.getUsersId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        user.updateNickname(dto.getNickname());
+        user.updateSchoolName(dto.getSchoolName());
+
         UserSetting setting = UserSetting.builder()
                 .usersId(dto.getUsersId())
                 .preferredStudyTime(dto.getPreferredStudyTime())
@@ -87,6 +95,11 @@ public class MyLearningService {
 
         UserLearningStyle style = userLearningStyleRepository.findByUsersIdAndIsActiveTrue(usersId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_LEARNING_STYLE_NOT_FOUND));
+
+        User user = userRepository.findById(usersId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        user.updateNickname(dto.getNickname());
+        user.updateSchoolName(dto.getSchoolName());
 
         setting.update(dto.getPreferredStudyTime(), dto.getOffDays(), dto.getPreferredMaterialFormat(),
                 dto.getPreferredClassStyle(), dto.getPreferredStudyMethod(), dto.getPreferredTeacherStyle(),
