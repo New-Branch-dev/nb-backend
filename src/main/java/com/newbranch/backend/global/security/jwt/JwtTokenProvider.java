@@ -1,6 +1,8 @@
 package com.newbranch.backend.global.security.jwt;
 
 import com.newbranch.backend.global.config.JwtProperties;
+import com.newbranch.backend.global.error.exception.BusinessException;
+import com.newbranch.backend.global.error.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +67,21 @@ public class JwtTokenProvider {
     public String getEmailFromToken(String token) {
         Claims claims = parseClaims(token);
         return claims.getSubject();
+    }
+
+    /**
+     * Refresh Token을 검증하고, 만료된 경우와 그 외 무효한 경우를 구분하여 예외를 던집니다
+     */
+    public void validateRefreshTokenOrThrow(String token) {
+        try {
+            parseClaims(token);
+        } catch (ExpiredJwtException e) {
+            log.error("Expired refresh token: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            log.error("Invalid refresh token: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+        }
     }
 
     /**

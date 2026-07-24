@@ -34,7 +34,7 @@ public class LearningGoalService {
      * 사용자의 활성 학습 목표 목록을 최신순으로 조회합니다.
      */
     public List<LearningGoalResponse> getGoals(String email) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         return learningGoalRepository.findAllByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
                 .stream()
                 .map(this::toSummaryResponse)
@@ -46,7 +46,7 @@ public class LearningGoalService {
      */
     @Transactional
     public LearningGoalResponse createGoal(String email, LearningGoalRequest request) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         List<Attachment> attachments = validateAndFetchAttachments(request.getAttachmentIds(), user);
 
         LearningGoal goal = saveGoal(user, request);
@@ -63,7 +63,7 @@ public class LearningGoalService {
      * 학습 목표 상세 정보를 조회합니다 (요일별 공부 시간, 제외 날짜 포함).
      */
     public LearningGoalResponse getGoal(String email, Long lgId) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         LearningGoal goal = findGoalByIdAndUser(lgId, user);
 
         List<String> methods = fetchMethodNames(goal);
@@ -77,7 +77,7 @@ public class LearningGoalService {
      * 제목 키워드로 학습 목표를 검색합니다.
      */
     public List<LearningGoalResponse> searchGoals(String email, String keyword) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         return learningGoalRepository.searchByKeyword(user, keyword)
                 .stream()
                 .map(this::toSummaryResponse)
@@ -89,7 +89,7 @@ public class LearningGoalService {
      */
     @Transactional
     public void deleteGoal(String email, Long lgId) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         findGoalByIdAndUser(lgId, user).deactivate();
     }
 
@@ -98,7 +98,7 @@ public class LearningGoalService {
      */
     @Transactional
     public LearningGoalResponse updateGoal(String email, Long lgId, LearningGoalRequest request) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         LearningGoal goal = findGoalByIdAndUser(lgId, user);
         goal.update(request.getTitle(), request.getPurpose(), request.getTargetScore(),
                 request.getMaxScore(), request.getStartDate(), request.getEndDate());
@@ -112,7 +112,7 @@ public class LearningGoalService {
     @Transactional
     public List<ByDayStudyTimeResponse> updateByDayStudyTimes(String email, Long lgId,
                                                                List<LearningGoalRequest.ByDayStudyTimeEntry> entries) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         LearningGoal goal = findGoalByIdAndUser(lgId, user);
         byDayStudyTimeRepository.deleteAllByLearningGoal(goal);
         saveByDayStudyTimes(user, goal, entries);
@@ -124,7 +124,7 @@ public class LearningGoalService {
      */
     @Transactional
     public List<LocalDate> updateExcludeDates(String email, Long lgId, List<LocalDate> excludeDates) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         LearningGoal goal = findGoalByIdAndUser(lgId, user);
         learningGoalExcludeRepository.deleteAllByLearningGoal(goal);
         saveExcludeDates(goal, excludeDates);

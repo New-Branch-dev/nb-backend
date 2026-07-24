@@ -20,12 +20,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * 이메일로 활성화된 사용자를 조회합니다
      */
-    Optional<User> findByLoginIdAndIsActiveTrue(String loginId);
+    Optional<User> findByEmailAndIsActiveTrue(String email);
 
     /**
-     * 이메일로 활성화된 사용자를 조회합니다
+     * 아이디로 활성화된 사용자를 조회합니다
      */
-    Optional<User> findByEmailAndIsActiveTrue(String email);
+    Optional<User> findByLoginIdAndIsActiveTrue(String loginId);
 
     /**
      * 이메일 중복 여부를 확인합니다

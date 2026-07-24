@@ -1,10 +1,8 @@
 package com.newbranch.backend.global.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -15,28 +13,17 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String host;
-
-    @Value("${spring.data.redis.port}")
-    private int port;
-
     /**
-     * Redis 연결 팩토리를 생성합니다
+     * RedisTemplate을 생성합니다 (Key와 Value 모두 String으로 직렬화)
+     *
+     * RedisConnectionFactory는 Spring Boot의 자동 설정에 위임한다 - 직접 LettuceConnectionFactory를
+     * host/port로만 생성하면 spring.data.redis.password/database/timeout/lettuce.pool.* 설정이
+     * 전부 무시되는 버그가 있었다.
      */
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(host, port);
-    }
-
-    /**
-     * RedisTemplate을 생성합니다
-     * Key와 Value 모두 String으로 직렬화
-     */
-    @Bean
-    public RedisTemplate<String, String> redisTemplate() {
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
+        template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
         return template;

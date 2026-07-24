@@ -32,6 +32,7 @@ public class LearningGoalController {
 
     @Operation(summary = "학습 목표 생성")
     @PostMapping
+    @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
     public ApiResponse<LearningGoalResponse> createGoal(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody LearningGoalRequest request) {
@@ -77,7 +78,7 @@ public class LearningGoalController {
     public ApiResponse<List<ByDayStudyTimeResponse>> updateByDayStudyTimes(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long lgId,
-            @RequestBody List<LearningGoalRequest.ByDayStudyTimeEntry> entries) {
+            @Valid @RequestBody List<LearningGoalRequest.ByDayStudyTimeEntry> entries) {
         return ApiResponse.success(learningGoalService.updateByDayStudyTimes(userDetails.getUsername(), lgId, entries));
     }
 

@@ -4,7 +4,9 @@ import com.newbranch.backend.domain.mylearning.dto.MyLearningRequest;
 import com.newbranch.backend.domain.mylearning.service.MyLearningService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +28,8 @@ public class MyLearningController {
     // 회원 설정, 학습유형  등록
     @Operation(summary = "회원 설정, 학습유형 생성")
     @PostMapping
-    public ResponseEntity<MyLearningRequest> createMyLearningData(@RequestBody MyLearningRequest dto) {
-        return ResponseEntity.ok(myLearningService.createMyLearningData(dto));
+    public ResponseEntity<MyLearningRequest> createMyLearningData(@Valid @RequestBody MyLearningRequest dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(myLearningService.createMyLearningData(dto));
     }
 
     // 회원 설정, 학습유형 수정
@@ -35,7 +37,7 @@ public class MyLearningController {
     @PutMapping("/{usersId}")
     public ResponseEntity<MyLearningRequest> updateMyLearningData(
             @PathVariable Long usersId,
-            @RequestBody MyLearningRequest dto) {
+            @Valid @RequestBody MyLearningRequest dto) {
         return ResponseEntity.ok(myLearningService.updateMyLearningData(usersId, dto));
     }
 

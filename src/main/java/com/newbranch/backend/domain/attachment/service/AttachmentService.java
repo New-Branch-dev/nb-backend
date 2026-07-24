@@ -36,7 +36,7 @@ public class AttachmentService {
      * 사용자의 활성 첨부파일 목록을 최신순으로 조회합니다.
      */
     public List<AttachmentResponse> getAttachments(String email) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         return attachmentRepository.findAllByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
                 .stream().map(AttachmentResponse::from).collect(Collectors.toList());
     }
@@ -45,7 +45,7 @@ public class AttachmentService {
      * 첨부파일 상세 정보를 조회합니다.
      */
     public AttachmentResponse getAttachment(String email, Long attachmentId) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         return AttachmentResponse.from(findByIdAndUser(attachmentId, user));
     }
 
@@ -54,7 +54,7 @@ public class AttachmentService {
      */
     @Transactional
     public List<AttachmentResponse> uploadFiles(String email, List<MultipartFile> files) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         return files.stream().map(file -> {
             String extractedText = textExtractionService.extract(file);
             String fileUrl = s3Uploader.upload(file, "attachments/files", S3Uploader.FILE_CONTENT_TYPES);
@@ -74,7 +74,7 @@ public class AttachmentService {
      */
     @Transactional
     public AttachmentResponse uploadLecture(String email, MultipartFile file) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         String extractedText = openAiClient.transcribeAudio(file);
         String fileUrl = s3Uploader.upload(file, "attachments/lectures", S3Uploader.LECTURE_CONTENT_TYPES);
         Attachment attachment = Attachment.builder()
@@ -92,7 +92,7 @@ public class AttachmentService {
      */
     @Transactional
     public AttachmentResponse saveUrl(String email, AttachmentUrlRequest request) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         Attachment attachment = Attachment.builder()
                 .user(user)
                 .attachmentType(request.getType())
@@ -107,7 +107,7 @@ public class AttachmentService {
      */
     @Transactional
     public AttachmentResponse saveText(String email, AttachmentTextRequest request) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         Attachment attachment = Attachment.builder()
                 .user(user)
                 .attachmentType(AttachmentType.TEXT)
@@ -122,7 +122,7 @@ public class AttachmentService {
      */
     @Transactional
     public void deleteAttachment(String email, Long attachmentId) {
-        User user = userQueryService.findByEmail(email);
+        User user = userQueryService.findByLoginId(email);
         Attachment attachment = findByIdAndUser(attachmentId, user);
         if (attachment.getAttachmentType() == AttachmentType.FILE
                 || attachment.getAttachmentType() == AttachmentType.LECTURE) {

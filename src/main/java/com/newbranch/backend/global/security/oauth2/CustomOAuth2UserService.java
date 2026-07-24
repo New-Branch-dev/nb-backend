@@ -68,7 +68,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         log.info("Creating new user from OAuth2: {}", attributes.getEmail());
 
         return User.builder()
-                .loginId(attributes.getEmail())
+                .loginId("google_" + attributes.getOauthId())
                 .email(attributes.getEmail())
                 .password("")
                 .nickname(attributes.getName())

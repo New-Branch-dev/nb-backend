@@ -1,6 +1,7 @@
 package com.newbranch.backend.domain.consolidation.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -37,6 +38,7 @@ public class ConsolidationRequest {
     @Schema(description = "매핑할 첨부파일 ID 목록 (등록 시 사용, 이미 업로드된 첨부파일 중 선택)")
     private List<Long> attachmentIds;
 
+    @Valid
     @Schema(description = "단권화 하위 자료 목록")
     private List<MaterialEntry> materials;
 

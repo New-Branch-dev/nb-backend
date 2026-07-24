@@ -200,6 +200,6 @@ public class AiStudyPlanService {
     }
 
     private User findUserByEmail(String email) {
-        return userQueryService.findByEmail(email);
+        return userQueryService.findByLoginId(email);
     }
 }
