@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "My Learning", description = "나만의 학습 API")
@@ -21,31 +23,43 @@ public class MyLearningController {
     // 회원 설정, 학습유형 조회
     @Operation(summary = "회원 설정, 학습유형 조회")
     @GetMapping("/{usersId}")
-    public ResponseEntity<MyLearningRequest> getMyLearningData(@PathVariable Long usersId) {
-        return ResponseEntity.ok(myLearningService.getMyLearningData(usersId));
+    public ResponseEntity<MyLearningRequest> getMyLearningData(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long usersId) {
+        // fix: usersId를 검증 없이 신뢰하던 IDOR을 막기 위해 토큰 주체와 대조하도록 변경 (siwon)
+        return ResponseEntity.ok(myLearningService.getMyLearningData(userDetails.getUsername(), usersId));
     }
 
     // 회원 설정, 학습유형  등록
     @Operation(summary = "회원 설정, 학습유형 생성")
     @PostMapping
-    public ResponseEntity<MyLearningRequest> createMyLearningData(@Valid @RequestBody MyLearningRequest dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(myLearningService.createMyLearningData(dto));
+    public ResponseEntity<MyLearningRequest> createMyLearningData(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody MyLearningRequest dto) {
+        // fix: 요청 바디의 usersId 대신 토큰 주체 기준으로 생성하도록 변경 (siwon)
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(myLearningService.createMyLearningData(userDetails.getUsername(), dto));
     }
 
     // 회원 설정, 학습유형 수정
     @Operation(summary = "회원 설정, 학습유형 수정")
     @PutMapping("/{usersId}")
     public ResponseEntity<MyLearningRequest> updateMyLearningData(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long usersId,
             @Valid @RequestBody MyLearningRequest dto) {
-        return ResponseEntity.ok(myLearningService.updateMyLearningData(usersId, dto));
+        // fix: usersId를 검증 없이 신뢰하던 IDOR을 막기 위해 토큰 주체와 대조하도록 변경 (siwon)
+        return ResponseEntity.ok(myLearningService.updateMyLearningData(userDetails.getUsername(), usersId, dto));
     }
 
     // 회원 설정, 학습유형 삭제
     @Operation(summary = "회원 설정, 학습유형 삭제")
     @DeleteMapping("/{usersId}")
-    public ResponseEntity<Void> deleteMyLearningData(@PathVariable Long usersId) {
-        myLearningService.deleteMyLearningData(usersId);
+    public ResponseEntity<Void> deleteMyLearningData(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long usersId) {
+        // fix: usersId를 검증 없이 신뢰하던 IDOR을 막기 위해 토큰 주체와 대조하도록 변경 (siwon)
+        myLearningService.deleteMyLearningData(userDetails.getUsername(), usersId);
         return ResponseEntity.noContent().build();
     }
 }

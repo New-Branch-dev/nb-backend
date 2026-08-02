@@ -121,4 +121,11 @@ public class User extends BaseEntity {
     public void verifyEmail() {
         this.emailVerified = true;
     }
+
+    /**
+     * 구글 계정을 연동합니다
+     */
+    public void linkGoogleAccount(String googleOauthId) {
+        this.googleOauthId = googleOauthId;
+    }
 }

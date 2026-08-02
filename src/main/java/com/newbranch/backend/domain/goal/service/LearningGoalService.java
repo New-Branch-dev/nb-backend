@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,10 +37,8 @@ public class LearningGoalService {
      */
     public List<LearningGoalResponse> getGoals(String email) {
         User user = userQueryService.findByLoginId(email);
-        return learningGoalRepository.findAllByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
-                .stream()
-                .map(this::toSummaryResponse)
-                .toList();
+        List<LearningGoal> goals = learningGoalRepository.findAllByUserAndIsActiveTrueOrderByCreatedAtDesc(user);
+        return toSummaryResponses(goals);
     }
 
     /**
@@ -78,10 +78,8 @@ public class LearningGoalService {
      */
     public List<LearningGoalResponse> searchGoals(String email, String keyword) {
         User user = userQueryService.findByLoginId(email);
-        return learningGoalRepository.searchByKeyword(user, keyword)
-                .stream()
-                .map(this::toSummaryResponse)
-                .toList();
+        List<LearningGoal> goals = learningGoalRepository.searchByKeyword(user, keyword);
+        return toSummaryResponses(goals);
     }
 
     /**
@@ -144,8 +142,22 @@ public class LearningGoalService {
 
     // ── private 헬퍼 ─────────────────────────────────────────────────────────
 
-    private LearningGoalResponse toSummaryResponse(LearningGoal goal) {
-        return LearningGoalResponse.from(goal, fetchMethodNames(goal));
+    // fix: 목표마다 fetchMethodNames를 개별 호출하면 목표 수만큼 쿼리가 나가서(N+1),
+    // 목록/검색 응답을 만들 때는 전체 목표의 학습 방법을 한 번에 배치 조회하도록 변경 (siwon)
+    private List<LearningGoalResponse> toSummaryResponses(List<LearningGoal> goals) {
+        if (goals.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, List<String>> methodsByGoalId = learningGoalMethodRepository
+                .findAllByLearningGoalInAndIsActiveTrue(goals)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        method -> method.getLearningGoal().getId(),
+                        Collectors.mapping(LearningGoalMethod::getMethodName, Collectors.toList())));
+
+        return goals.stream()
+                .map(goal -> LearningGoalResponse.from(goal, methodsByGoalId.getOrDefault(goal.getId(), List.of())))
+                .toList();
     }
 
     private List<Attachment> validateAndFetchAttachments(List<Long> ids, User user) {

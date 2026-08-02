@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -73,6 +74,15 @@ public class AuthService {
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest request) {
         Authentication authentication = authenticate(request);
+
+        // fix: 이메일 미인증 계정도 비밀번호만 맞으면 로그인이 되던 문제 차단
+        // (타인 이메일로 가입 후 인증 없이 그 계정을 계속 쓸 수 있었고, 이후 진짜 소유자가
+        // 구글 로그인으로 같은 이메일을 연동하면 공격자 계정에 묶이는 시나리오로 이어짐) (siwon)
+        User user = getUserByLoginId(authentication.getName());
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new BusinessException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
+
         return generateTokens(authentication);
     }
 
@@ -126,8 +136,10 @@ public class AuthService {
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getLoginId(), request.getPassword())
             );
-        } catch (Exception e) {
-            log.error("Authentication failed for user: {}", request.getLoginId());
+        } catch (AuthenticationException e) {
+            // fix: catch(Exception)이면 DB 장애/NPE 등 실제 장애까지 "비밀번호 오류"로 감춰버려서
+            // 인증 실패로 좁혀 원인 파악이 가능하도록 수정 (siwon)
+            log.warn("Authentication failed for user: {}", request.getLoginId());
             throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
         }
     }

@@ -2,6 +2,8 @@ package com.newbranch.backend.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.newbranch.backend.domain.user.entity.EmailVerification;
+import com.newbranch.backend.domain.user.repository.EmailVerificationRepository;
 import com.newbranch.backend.infra.extraction.TextExtractionService;
 import com.newbranch.backend.infra.openai.OpenAiClient;
 import jakarta.mail.Session;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,6 +47,9 @@ public abstract class IntegrationTestSupport {
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Autowired
+    protected EmailVerificationRepository emailVerificationRepository;
 
     // External services are never actually called in tests - mocked out.
     @MockBean
@@ -94,6 +100,14 @@ public abstract class IntegrationTestSupport {
                         .contentType("application/json")
                         .content(signupBody))
                 .andExpect(status().isCreated());
+
+        // fix: 로그인 시 이메일 인증 여부를 확인하도록 막아서(AuthService.login), 테스트 헬퍼도
+        // 실제 인증 플로우를 거치도록 보완 (siwon)
+        EmailVerification verification = emailVerificationRepository
+                .findTopByEmailOrderByCreatedAtDesc(email)
+                .orElseThrow();
+        mockMvc.perform(get("/api/v1/auth/verify-email").param("token", verification.getToken()))
+                .andExpect(status().isOk());
 
         String loginBody = """
                 {

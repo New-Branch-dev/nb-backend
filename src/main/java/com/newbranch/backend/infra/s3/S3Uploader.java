@@ -42,10 +42,16 @@ public class S3Uploader {
     private String region;
 
     public String upload(MultipartFile file, String dirName, Set<String> allowedContentTypes) {
-        if (!allowedContentTypes.contains(file.getContentType())) {
+        // fix: Set.of(...)의 contains(null)은 NPE를 던져서 Content-Type 헤더가 없는 요청이
+        // 500으로 노출됐음. null이면 곧바로 잘못된 파일 타입으로 취급 (siwon)
+        String contentType = file.getContentType();
+        if (contentType == null || !allowedContentTypes.contains(contentType)) {
             throw new BusinessException(ErrorCode.INVALID_FILE_TYPE);
         }
-        String key = dirName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+        // fix: 클라이언트가 보낸 원본 파일명을 그대로 키에 이어붙이면 "/", ".." 등을 넣어
+        // 의도한 디렉터리 밖으로 객체를 쓰거나 덮어쓸 수 있어 경로 구분자를 제거 (siwon)
+        String safeFilename = sanitizeFilename(file.getOriginalFilename());
+        String key = dirName + "/" + UUID.randomUUID() + "_" + safeFilename;
         try {
             s3Client.putObject(
                     PutObjectRequest.builder()
@@ -75,5 +81,14 @@ public class S3Uploader {
 
     private String extractKeyFromUrl(String fileUrl) {
         return fileUrl.substring(fileUrl.indexOf(".amazonaws.com/") + ".amazonaws.com/".length());
+    }
+
+    private String sanitizeFilename(String originalFilename) {
+        if (originalFilename == null || originalFilename.isBlank()) {
+            return "file";
+        }
+        String nameOnly = originalFilename.replace("\\", "/");
+        nameOnly = nameOnly.substring(nameOnly.lastIndexOf('/') + 1);
+        return nameOnly.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 }

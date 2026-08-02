@@ -4,6 +4,7 @@ import com.newbranch.backend.global.common.response.ApiResponse;
 import com.newbranch.backend.global.error.exception.BusinessException;
 import com.newbranch.backend.global.error.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -24,10 +25,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
-        log.error("BusinessException: {}", e.getMessage());
         ErrorCode errorCode = e.getErrorCode();
+        // fix: 비밀번호 오류 같은 정상적인 4xx 응답까지 error 레벨로 찍혀 로그/알림이 오염되던 문제라
+        // 5xx만 error로, 나머지는 warn으로 분리 (siwon)
+        if (errorCode.getStatus().is5xxServerError()) {
+            log.error("BusinessException: {}", e.getMessage());
+        } else {
+            log.warn("BusinessException: {}", e.getMessage());
+        }
         ApiResponse<Void> response = ApiResponse.error(errorCode.getCode(), errorCode.getMessage());
         return ResponseEntity.status(errorCode.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        // fix: 동시 회원가입 등 유니크 제약 위반 시 처리하는 핸들러가 없어 500으로 노출되던 문제 수정 (siwon)
+        log.warn("DataIntegrityViolationException: {}", e.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(
+                ErrorCode.DUPLICATE_RESOURCE.getCode(), ErrorCode.DUPLICATE_RESOURCE.getMessage());
+        return ResponseEntity.status(ErrorCode.DUPLICATE_RESOURCE.getStatus()).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -68,6 +68,44 @@ class UserControllerTest extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.code").value("C002"));
     }
 
+    // fix: 현재 비밀번호 확인 없이 변경되던 문제의 회귀 검증 (siwon)
+    @Test
+    @DisplayName("현재 비밀번호 없이 새 비밀번호로 수정하면 400 INVALID_CURRENT_PASSWORD를 반환한다")
+    void updateCurrentUser_passwordWithoutCurrentPassword() throws Exception {
+        IntegrationTestSupport.TestUser user = signupAndLogin();
+        String body = """
+                {"newPassword":"newPassword123!"}
+                """;
+
+        mockMvc.perform(put("/api/v1/users/me")
+                        .header("Authorization", bearer(user.accessToken()))
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("A006"));
+    }
+
+    @Test
+    @DisplayName("올바른 현재 비밀번호로 새 비밀번호를 수정하면 200을 반환하고 새 비밀번호로 로그인된다")
+    void updateCurrentUser_passwordSuccess() throws Exception {
+        IntegrationTestSupport.TestUser user = signupAndLogin();
+        String body = """
+                {"newPassword":"newPassword123!","currentPassword":"%s"}
+                """.formatted(user.password());
+
+        mockMvc.perform(put("/api/v1/users/me")
+                        .header("Authorization", bearer(user.accessToken()))
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk());
+
+        String loginBody = """
+                {"loginId":"%s","password":"newPassword123!"}
+                """.formatted(user.loginId());
+        mockMvc.perform(post("/api/v1/auth/login").contentType("application/json").content(loginBody))
+                .andExpect(status().isOk());
+    }
+
     // 18. 회원 탈퇴 정상
     @Test
     @DisplayName("로그인 상태에서 회원 탈퇴를 요청하면 200을 반환하고 계정이 비활성화된다")

@@ -14,6 +14,32 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # fix: 이전에는 -x test로 테스트를 아예 건너뛰어서 깨진 코드가 그대로 main에 머지/배포될 수
+    # 있었음. 통합테스트가 붙는 실제 Postgres/Redis를 서비스 컨테이너로 띄워서 테스트를 실행 (siwon)
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: newbranch_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,8 +63,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Run tests
+        env:
+          # CI 전용 더미 값. .env에 의존하지 않아야 .env를 git에서 지운 뒤에도 파이프라인이 깨지지 않음
+          JWT_SECRET_KEY: ci-pipeline-only-dummy-secret-key-not-used-anywhere-else-32bytes
+          GOOGLE_CLIENT_ID: ci-dummy-client-id
+          GOOGLE_CLIENT_SECRET: ci-dummy-client-secret
+        run: ./gradlew test --no-daemon
+
       - name: Build with Gradle
-        run: ./gradlew clean build -x test --no-daemon
+        run: ./gradlew build -x test --no-daemon
 
       - name: Upload build artifact
         if: success()
