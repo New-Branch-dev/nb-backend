@@ -32,5 +32,5 @@ docker-compose.yml
 logs/
 
 # Environment
-.env
+src/main/resources/.env
 .env.local
