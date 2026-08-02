@@ -7,6 +7,7 @@ import com.newbranch.backend.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -26,6 +29,15 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final EmailVerificationRepository emailVerificationRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    // fix: Math.random()은 예측 가능해 6자리 코드를 통계적으로 더 쉽게 맞출 수 있어 CSPRNG로 교체 (siwon)
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    // fix: 시도 횟수 제한이 없어 90만 경우의 수인 6자리 코드를 브루트포스로 뚫을 수 있었음 (siwon)
+    private static final String VERIFY_ATTEMPT_PREFIX = "EV_ATTEMPT:";
+    private static final int MAX_VERIFY_ATTEMPTS = 5;
+    private static final Duration VERIFY_ATTEMPT_WINDOW = Duration.ofMinutes(10);
 
     @Value("${email.from}")
     private String fromEmail;
@@ -84,6 +96,9 @@ public class EmailService {
      */
     @Transactional
     public void verifyEmailCode(String email, String token) {
+        // fix: 검증 시도마다 카운트를 올리고 한도를 넘으면 차단해서 브루트포스 방지 (siwon)
+        checkAndIncrementAttempts(email);
+
         EmailVerification emailVerification = emailVerificationRepository.findTopByEmailOrderByCreatedAtDesc(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_VERIFICATION_TOKEN));
 
@@ -100,7 +115,22 @@ public class EmailService {
         }
 
         emailVerification.verify();
+        redisTemplate.delete(VERIFY_ATTEMPT_PREFIX + email);
         log.info("Email successfully verified via code: {}", email);
+    }
+
+    /**
+     * 이메일별 검증 시도 횟수를 증가시키고 한도 초과 시 예외를 던집니다
+     */
+    private void checkAndIncrementAttempts(String email) {
+        String key = VERIFY_ATTEMPT_PREFIX + email;
+        Long attempts = redisTemplate.opsForValue().increment(key);
+        if (attempts != null && attempts == 1L) {
+            redisTemplate.expire(key, VERIFY_ATTEMPT_WINDOW);
+        }
+        if (attempts != null && attempts > MAX_VERIFY_ATTEMPTS) {
+            throw new BusinessException(ErrorCode.TOO_MANY_VERIFICATION_ATTEMPTS);
+        }
     }
 
     /**
@@ -147,7 +177,7 @@ public class EmailService {
      * 6자리 숫자 인증번호를 생성합니다
      */
     private String generateVerificationToken() {
-        return String.valueOf((int) (Math.random() * 899999) + 100000);
+        return String.valueOf(SECURE_RANDOM.nextInt(900000) + 100000);
     }
 
     /**

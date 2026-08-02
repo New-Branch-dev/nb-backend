@@ -11,9 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * QA 테스트케이스 표 66~73번 (My Learning 도메인) 검증
- *
- * 참고: /api/mylearning은 인증(JWT) 필요 여부와 무관하게 usersId를 그대로 신뢰하는 구조라
- * (본인 확인 로직이 없음) 여기서는 QA 표에 정의된 정상/404 케이스만 검증한다.
  */
 class MyLearningControllerTest extends IntegrationTestSupport {
 
@@ -138,6 +135,65 @@ class MyLearningControllerTest extends IntegrationTestSupport {
         mockMvc.perform(delete("/api/mylearning/999999999").header("Authorization", bearer(user.accessToken())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("M002"));
+    }
+
+    // fix: 타인의 usersId로 조회/수정/삭제가 가능했던 IDOR을 막았는지 회귀 검증 (siwon)
+    @Test
+    @DisplayName("타인의 usersId를 조회하면 403 ACCESS_DENIED를 반환한다")
+    void getMyLearningData_otherUsers() throws Exception {
+        IntegrationTestSupport.TestUser owner = signupAndLogin();
+        IntegrationTestSupport.TestUser intruder = signupAndLogin();
+        long ownerUsersId = fetchUsersId(owner);
+        createMyLearning(owner, ownerUsersId, "타인설정");
+
+        mockMvc.perform(get("/api/mylearning/" + ownerUsersId).header("Authorization", bearer(intruder.accessToken())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("C006"));
+    }
+
+    @Test
+    @DisplayName("타인의 usersId를 수정하면 403 ACCESS_DENIED를 반환한다")
+    void updateMyLearningData_otherUsers() throws Exception {
+        IntegrationTestSupport.TestUser owner = signupAndLogin();
+        IntegrationTestSupport.TestUser intruder = signupAndLogin();
+        long ownerUsersId = fetchUsersId(owner);
+        createMyLearning(owner, ownerUsersId, "타인설정");
+
+        mockMvc.perform(put("/api/mylearning/" + ownerUsersId)
+                        .header("Authorization", bearer(intruder.accessToken()))
+                        .contentType("application/json")
+                        .content(requestBody(ownerUsersId, "탈취시도")))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("C006"));
+    }
+
+    @Test
+    @DisplayName("타인의 usersId를 삭제하면 403 ACCESS_DENIED를 반환한다")
+    void deleteMyLearningData_otherUsers() throws Exception {
+        IntegrationTestSupport.TestUser owner = signupAndLogin();
+        IntegrationTestSupport.TestUser intruder = signupAndLogin();
+        long ownerUsersId = fetchUsersId(owner);
+        createMyLearning(owner, ownerUsersId, "타인설정");
+
+        mockMvc.perform(delete("/api/mylearning/" + ownerUsersId).header("Authorization", bearer(intruder.accessToken())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("C006"));
+    }
+
+    // fix: 활성 설정이 있는 상태에서 재생성 시 500 대신 409를 반환하는지 검증 (siwon)
+    @Test
+    @DisplayName("이미 설정이 있는 사용자가 다시 생성하면 409 MY_LEARNING_ALREADY_EXISTS를 반환한다")
+    void createMyLearningData_duplicate() throws Exception {
+        IntegrationTestSupport.TestUser user = signupAndLogin();
+        long usersId = fetchUsersId(user);
+        createMyLearning(user, usersId, "최초설정");
+
+        mockMvc.perform(post("/api/mylearning")
+                        .header("Authorization", bearer(user.accessToken()))
+                        .contentType("application/json")
+                        .content(requestBody(usersId, "중복설정")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("M001"));
     }
 
     private long fetchUsersId(IntegrationTestSupport.TestUser user) throws Exception {

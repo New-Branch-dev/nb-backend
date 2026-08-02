@@ -80,7 +80,7 @@ public class UserService {
         updateNicknameIfPresent(user, request.getNickname());
         updateAgeGroupIfPresent(user, request.getAgeGroup());
         updateSchoolNameIfPresent(user, request.getSchoolName());
-        updatePasswordIfPresent(user, request.getNewPassword());
+        updatePasswordIfPresent(user, request);
     }
 
     private void updateNicknameIfPresent(User user, String nickname) {
@@ -101,10 +101,18 @@ public class UserService {
         }
     }
 
-    private void updatePasswordIfPresent(User user, String newPassword) {
-        if (newPassword != null) {
-            String encodedPassword = passwordEncoder.encode(newPassword);
-            user.updatePassword(encodedPassword);
+    private void updatePasswordIfPresent(User user, UpdateUserRequest request) {
+        String newPassword = request.getNewPassword();
+        if (newPassword == null) {
+            return;
         }
+        // fix: 현재 비밀번호 확인 없이 변경 가능해서 탈취된 access token만으로 영구 계정 탈취가
+        // 가능했던 문제 차단 (siwon)
+        if (request.getCurrentPassword() == null
+                || !passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.INVALID_CURRENT_PASSWORD);
+        }
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.updatePassword(encodedPassword);
     }
 }

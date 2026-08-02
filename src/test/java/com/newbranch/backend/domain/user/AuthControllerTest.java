@@ -120,6 +120,25 @@ class AuthControllerTest extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.code").value("A005"));
     }
 
+    // fix: 이메일 미인증 계정의 로그인 차단 회귀 검증 (siwon)
+    @Test
+    @DisplayName("이메일 인증을 하지 않은 계정으로 로그인하면 400 EMAIL_NOT_VERIFIED를 반환한다")
+    void login_emailNotVerified() throws Exception {
+        String suffix = uniqueSuffix();
+        String signupBody = """
+                {"loginId":"user%s","email":"user%s@test.com","password":"password123!","nickname":"nick%s"}
+                """.formatted(suffix, suffix, suffix);
+        mockMvc.perform(post("/api/v1/auth/signup").contentType("application/json").content(signupBody))
+                .andExpect(status().isCreated());
+
+        String loginBody = """
+                {"loginId":"user%s","password":"password123!"}
+                """.formatted(suffix);
+        mockMvc.perform(post("/api/v1/auth/login").contentType("application/json").content(loginBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("E004"));
+    }
+
     // 7. 존재하지 않는 계정으로 로그인
     @Test
     @DisplayName("존재하지 않는 아이디로 로그인하면 401 INVALID_CREDENTIALS를 반환한다")
@@ -219,9 +238,19 @@ class AuthControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("발송된 인증 코드로 이메일 인증을 완료하면 200을 반환한다")
     void verifyEmail_success() throws Exception {
-        IntegrationTestSupport.TestUser user = signupAndLogin();
+        // fix: signupAndLogin()이 로그인 전에 이메일을 직접 인증해버려서(로그인 시 이메일 미인증
+        // 차단 fix 때문에), 검증용 토큰이 이미 소모된 상태였음. 이 테스트는 검증 자체가 목적이라
+        // signupAndLogin() 대신 가입만 하고 인증 전 상태를 유지한다 (siwon)
+        String suffix = uniqueSuffix();
+        String email = "user" + suffix + "@test.com";
+        String signupBody = """
+                {"loginId":"user%s","email":"%s","password":"password123!","nickname":"nick%s"}
+                """.formatted(suffix, email, suffix);
+        mockMvc.perform(post("/api/v1/auth/signup").contentType("application/json").content(signupBody))
+                .andExpect(status().isCreated());
+
         EmailVerification verification = emailVerificationRepository
-                .findTopByEmailOrderByCreatedAtDesc(user.email())
+                .findTopByEmailOrderByCreatedAtDesc(email)
                 .orElseThrow();
 
         mockMvc.perform(get("/api/v1/auth/verify-email").param("token", verification.getToken()))
@@ -234,9 +263,18 @@ class AuthControllerTest extends IntegrationTestSupport {
     @Transactional
     @DisplayName("만료된 인증 코드로 인증을 요청하면 400 EXPIRED_VERIFICATION_TOKEN을 반환한다")
     void verifyEmail_expiredToken() throws Exception {
-        IntegrationTestSupport.TestUser user = signupAndLogin();
+        // fix: signupAndLogin()이 이미 이 토큰으로 인증을 끝내버려서(ALREADY_VERIFIED) 만료 시나리오를
+        // 테스트할 수 없었음. 가입만 하고 인증 전 상태를 유지한다 (siwon)
+        String suffix = uniqueSuffix();
+        String email = "user" + suffix + "@test.com";
+        String signupBody = """
+                {"loginId":"user%s","email":"%s","password":"password123!","nickname":"nick%s"}
+                """.formatted(suffix, email, suffix);
+        mockMvc.perform(post("/api/v1/auth/signup").contentType("application/json").content(signupBody))
+                .andExpect(status().isCreated());
+
         EmailVerification verification = emailVerificationRepository
-                .findTopByEmailOrderByCreatedAtDesc(user.email())
+                .findTopByEmailOrderByCreatedAtDesc(email)
                 .orElseThrow();
 
         entityManager.createQuery(

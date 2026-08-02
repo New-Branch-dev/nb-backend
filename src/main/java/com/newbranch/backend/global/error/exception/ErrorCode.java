@@ -15,6 +15,7 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "C004", "Entity not found"),
     INVALID_TYPE_VALUE(HttpStatus.BAD_REQUEST, "C005", "Invalid type value"),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "C006", "Access denied"),
+    DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "C007", "Duplicate resource"),
 
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User not found"),
@@ -42,6 +43,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "A003", "Refresh token not found"),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A004", "Refresh token expired"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A005", "Invalid email or password"),
+    INVALID_CURRENT_PASSWORD(HttpStatus.BAD_REQUEST, "A006", "Current password is incorrect"),
 
     // AI
     AI_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI001", "AI service error"),
@@ -52,7 +54,8 @@ public enum ErrorCode {
     EXPIRED_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "E002", "Verification token expired"),
     ALREADY_VERIFIED_EMAIL(HttpStatus.BAD_REQUEST, "E003", "Email already verified"),
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "E004", "Email not verified"),
-    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "E005", "Failed to send email");
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "E005", "Failed to send email"),
+    TOO_MANY_VERIFICATION_ATTEMPTS(HttpStatus.TOO_MANY_REQUESTS, "E006", "Too many verification attempts");
 
     private final HttpStatus status;
     private final String code;

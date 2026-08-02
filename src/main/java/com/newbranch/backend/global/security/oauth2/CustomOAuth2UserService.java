@@ -5,6 +5,7 @@ import com.newbranch.backend.domain.user.entity.User;
 import com.newbranch.backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * OAuth2 사용자 정보를 처리하는 서비스
@@ -23,6 +25,7 @@ import java.util.Map;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -57,7 +60,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
      * 기존 사용자 정보를 업데이트합니다
      */
     private User updateExistingUser(User user, OAuth2Attributes attributes) {
-        log.info("Updating existing user from OAuth2: {}", attributes.getEmail());
+        // fix: 이메일만 일치하면 그대로 계정을 연동해서, 공격자가 피해자 이메일로 먼저 가입(미인증)해두면
+        // 나중에 진짜 소유자가 구글 로그인 시 공격자 계정에 묶이는 pre-hijack이 가능했음.
+        // 미인증 상태였던 계정은 구글 인증을 더 강한 소유권 증거로 보고, 기존 비밀번호를 무효화한 뒤
+        // 인증 완료 처리하여 공격자의 비밀번호 로그인 경로를 차단한다 (siwon)
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+            log.warn("Reclaiming unverified account via Google OAuth: {}", attributes.getEmail());
+            user.updatePassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.verifyEmail();
+        } else {
+            log.info("Updating existing user from OAuth2: {}", attributes.getEmail());
+        }
+        user.linkGoogleAccount(attributes.getOauthId());
         return user;
     }
 

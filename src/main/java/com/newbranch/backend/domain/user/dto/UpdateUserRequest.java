@@ -24,4 +24,9 @@ public class UpdateUserRequest {
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다")
     @Schema(description = "새 비밀번호 (변경 시에만)", example = "newPassword123!")
     private String newPassword;
+
+    // fix: 비밀번호 변경 시 현재 비밀번호 확인이 없어 탈취된 access token만으로 영구 계정 탈취가
+    // 가능했던 문제라 현재 비밀번호 필드 추가 (siwon)
+    @Schema(description = "현재 비밀번호 (비밀번호 변경 시 필수)", example = "currentPassword123!")
+    private String currentPassword;
 }

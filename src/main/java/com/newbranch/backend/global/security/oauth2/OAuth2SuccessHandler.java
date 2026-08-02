@@ -59,12 +59,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         storeRefreshToken(loginId, refreshToken);
 
+        // fix: 토큰을 쿼리스트링으로 보내면 브라우저 히스토리/서버·프록시 접근로그/Referer 헤더로
+        // 유출될 수 있어(특히 refresh token) 서버로 전송되지 않는 URL fragment로 이동 (siwon)
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
-                .queryParam("accessToken", accessToken)
-                .queryParam("refreshToken", refreshToken)
-                .queryParam("nickname", nickname)
                 .build()
-                .toUriString();
+                .toUriString()
+                + "#accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
+                + "&refreshToken=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8)
+                + "&nickname=" + nickname;
 
         log.info("OAuth2 login success for user: {}", loginId);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
