@@ -50,6 +50,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # fix: CI가 Docker Hub에 빌드/푸시한 이미지를 EC2가 그냥 pull만 받아서 뜨도록 image를 추가.
+    # 로컬 개발에서는 APP_IMAGE를 안 정해주면 기존처럼 --build로 로컬 빌드/태깅됨 (siwon)
+    image: ${APP_IMAGE:-nb-backend-app:local}
     container_name: newbranch-app
     restart: unless-stopped
     depends_on:

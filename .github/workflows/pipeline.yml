@@ -127,26 +127,20 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Phase C: EC2 Deploy (Optional - uncomment when ready)
-      # - name: Deploy to EC2
-      #   uses: appleboy/ssh-action@v1.0.0
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USERNAME }}
-      #     key: ${{ secrets.EC2_SSH_KEY }}
-      #     script: |
-      #       docker pull ${{ secrets.DOCKER_USERNAME }}/newbranch-backend:latest
-      #       docker stop newbranch-app || true
-      #       docker rm newbranch-app || true
-      #       docker run -d \
-      #         --name newbranch-app \
-      #         --restart unless-stopped \
-      #         -p 8080:8080 \
-      #         -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
-      #         -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
-      #         -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
-      #         -e SPRING_JPA_DDL_AUTO=update \
-      #         -e SERVER_PORT=8080 \
-      #         -e LOG_LEVEL=INFO \
-      #         ${{ secrets.DOCKER_USERNAME }}/newbranch-backend:latest
-      #       docker image prune -af
+      # fix: EC2가 매번 소스에서 Gradle로 직접 빌드하면(1GB~2GB 인스턴스에) 디스크/메모리 부담이
+      # 커서, CI가 미리 빌드해 Docker Hub에 올린 이미지를 EC2는 pull만 받아 재기동하도록 변경.
+      # docker-compose.yml의 app 서비스가 이제 image: ${APP_IMAGE}를 참조하므로, EC2의 .env에
+      # APP_IMAGE=<도커허브계정>/newbranch-backend:latest 한 줄만 있으면 됨 (siwon)
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/nb-backend
+            git pull origin main
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            docker compose pull app
+            docker compose up -d
+            docker image prune -af
